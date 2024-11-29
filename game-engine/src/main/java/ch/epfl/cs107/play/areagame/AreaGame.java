@@ -130,7 +130,7 @@ abstract public class AreaGame implements Game, PauseMenu.Pausable {
             menu.update(deltaTime);
         } else {
             currentArea.update(deltaTime);
-           // currentArea.draw(getWindow());
+            currentArea.draw(getWindow());
         }
     }
 
