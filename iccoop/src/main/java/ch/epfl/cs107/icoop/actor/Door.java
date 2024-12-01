@@ -9,6 +9,7 @@ import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.logic.Logic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,12 +18,17 @@ public class Door extends AreaEntity {
 
     private String destination;
     private Logic signal;
-    private List<DiscreteCoordinates> playerDestination;
-    private List<DiscreteCoordinates> position;
+    private DiscreteCoordinates[] playerDestination;
+    private DiscreteCoordinates[] otherPositions;
+    private DiscreteCoordinates mainPosition;
+
 
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
-        return Collections.singletonList(getCurrentMainCellCoordinates());
+        List <DiscreteCoordinates> cells = new ArrayList<>();
+        Collections.addAll(cells, otherPositions);
+        cells.add(mainPosition);
+        return cells;
 
     }
 
@@ -30,27 +36,28 @@ public class Door extends AreaEntity {
         return signal;
     }
 
-    public Door(Area area, String destination, Logic signal, DiscreteCoordinates posPlayer1, DiscreteCoordinates posPlayer2, DiscreteCoordinates position) {
-        super(area, Orientation.DOWN, position);
+    public Door(Area area, String destination, Logic signal, DiscreteCoordinates posPlayer1, DiscreteCoordinates posPlayer2, DiscreteCoordinates mainPos) {
+        super(area, Orientation.DOWN, mainPos);
         this.destination = destination;
         this.signal = signal;
-        playerDestination = Arrays.asList(posPlayer1, posPlayer2);
-        this.position = List.of(position);
+        playerDestination = new DiscreteCoordinates[]{posPlayer1, posPlayer2};
+        mainPosition = mainPos;
     }
 
-    public Door(Area area, String destination, Logic signal, DiscreteCoordinates posPlayer1, DiscreteCoordinates posPlayer2, DiscreteCoordinates ... position) {
-        super(area, Orientation.DOWN, position[0]);
+    public Door(Area area, String destination, Logic signal, DiscreteCoordinates posPlayer1, DiscreteCoordinates posPlayer2,DiscreteCoordinates mainPos, DiscreteCoordinates ... otherPos) {
+        super(area, Orientation.DOWN, mainPos);
         this.destination = destination;
         this.signal = signal;
-        playerDestination = Arrays.asList(posPlayer1, posPlayer2);
-        this.position = List.of(position);
+        playerDestination = new DiscreteCoordinates[]{posPlayer1, posPlayer2};
+        mainPosition = mainPos;
+        otherPositions = otherPos;
     }
 
     public String getDestination() {
         return destination;
     }
 
-    public List<DiscreteCoordinates> getPlayerDestination() {
+    public DiscreteCoordinates[] getPlayerDestination() {
         return playerDestination;
     }
 
@@ -73,10 +80,6 @@ public class Door extends AreaEntity {
     @Override
     public void acceptInteraction (AreaInteractionVisitor v, boolean isCellInteraction ) {
         ((ICoopInteractionVisitor) v).interactWith(this ,isCellInteraction );
-    }
-
-    public boolean setDoorIsPassed(){
-        return true;
     }
 
 }

@@ -37,7 +37,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     final Orientation[] orders = {DOWN, RIGHT, UP, LEFT};
     private OrientedAnimation animation;
     private KeyBindings.PlayerKeyBindings keys = KeyBindings.RED_PLAYER_KEY_BINDINGS;
-    public ICoopPlayerInteractionHandler handler;
+    private ICoopPlayerInteractionHandler handler;
     private Door currentDoor;
     private boolean doorIsPassed;
 
@@ -73,9 +73,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         } else {
             animation.reset();
         }
-
-
-
         Keyboard keyboard = getOwnerArea().getKeyboard();
         moveIfPressed(Orientation.LEFT, keyboard.get(keys.left()));
         moveIfPressed(UP, keyboard.get(keys.up()));
@@ -132,9 +129,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
-        if (other instanceof Door) {
-            handler.interactWith((Door)other, isCellInteraction);
-        }
+        handler.interactWith(other, isCellInteraction);
     }
 
     public void setCurrentDoor(Door door){
@@ -193,8 +188,8 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
      */
     public void enterArea(Area area, DiscreteCoordinates position) {
         area.registerActor(this);
-        area.setViewCandidate(this);
         setOwnerArea(area);
+
         setCurrentPosition(position.toVector());
         resetMotion();
     }
@@ -213,12 +208,28 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
     private class ICoopPlayerInteractionHandler implements ICoopInteractionVisitor {
 
+        @Override
+        public void interactWith(Interactable interactable, boolean isCellInteraction) {
+            if (interactable instanceof Door){
+                interactWith((Door) interactable, isCellInteraction);
+            }
+
+            if (interactable instanceof Bomb) {
+                interactWith((Bomb) interactable, isCellInteraction);
+            }
+        }
+
+        @Override
         public void interactWith(Door door, boolean isCellInteraction) {
             if (door.getSignal().isOn()) {
                 setCurrentDoor(door);
                 setDoorIsPassed(true);
-                System.out.println("test");
             }
+        }
+
+        @Override
+        public void interactWith(Bomb bomb, boolean isCellInteraction) {
+            bomb.activate();
         }
     }
 }

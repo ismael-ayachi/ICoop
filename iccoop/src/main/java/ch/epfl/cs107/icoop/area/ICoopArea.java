@@ -16,7 +16,7 @@ public abstract class ICoopArea extends Area {
     /**
      * @return the player's spawn position in the area
      */
-    public abstract DiscreteCoordinates getPlayerSpawnPosition();
+    public abstract DiscreteCoordinates[] getPlayerSpawnPosition();
 
     /**
      * Callback to initialise the instance of the area
@@ -47,6 +47,14 @@ public abstract class ICoopArea extends Area {
         return cameraScaleFactor;
     }
 
+    public final float getDefaultCameraScaleFactor() {
+        return DEFAULT_SCALE_FACTOR;
+    }
+
+    public void setCameraScaleFactor(float factor) {
+        cameraScaleFactor = factor;
+    }
+
     @Override
-    public boolean isViewCentered () { return true ; }
+    public boolean isViewCentered () { return false ; }
 }
