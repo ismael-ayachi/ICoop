@@ -29,7 +29,7 @@ import static ch.epfl.cs107.play.math.Orientation.*;
 /**
  * A ICoopPlayer is a player for the ICoop game.
  */
-public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor {
+public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor, Interactable {
     private final Element element;
     private final String prefix;
     private final static int ANIMATION_DURATION = 4;
@@ -37,6 +37,9 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     final Orientation[] orders = {DOWN, RIGHT, UP, LEFT};
     private OrientedAnimation animation;
     private KeyBindings.PlayerKeyBindings keys = KeyBindings.RED_PLAYER_KEY_BINDINGS;
+    public ICoopPlayerInteractionHandler handler;
+    private Door currentDoor;
+    private boolean doorIsPassed;
 
     /**
      * @param owner       (Area) area to which the player belong
@@ -57,6 +60,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
                 anchor, orders, 4, 1, 2, 16, 32,
                 true);
         resetMotion();
+        handler = new ICoopPlayerInteractionHandler();
     }
 
     /**
@@ -69,6 +73,9 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         } else {
             animation.reset();
         }
+
+
+
         Keyboard keyboard = getOwnerArea().getKeyboard();
         moveIfPressed(Orientation.LEFT, keyboard.get(keys.left()));
         moveIfPressed(UP, keyboard.get(keys.up()));
@@ -125,7 +132,25 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
+        if (other instanceof Door) {
+            handler.interactWith((Door)other, isCellInteraction);
+        }
+    }
 
+    public void setCurrentDoor(Door door){
+        this.currentDoor = door;
+    }
+
+    public Door getCurrentDoor(){
+        return currentDoor;
+    }
+
+    public void setDoorIsPassed(boolean doorIsPassed){
+        this.doorIsPassed=doorIsPassed;
+    }
+
+    public boolean isDoorPassed(){
+        return doorIsPassed;
     }
 
     @Override
@@ -187,12 +212,14 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     }
 
     private class ICoopPlayerInteractionHandler implements ICoopInteractionVisitor {
-        public void interactWith(Interactor interactor, ICoopBehavior.ICoopCell cellule) {
-        }
 
-        public void interactWith(Interactor interactor, Door door) {
+        public void interactWith(Door door, boolean isCellInteraction) {
             if (door.getSignal().isOn()) {
+                setCurrentDoor(door);
+                setDoorIsPassed(true);
+                System.out.println("test");
             }
         }
     }
 }
+

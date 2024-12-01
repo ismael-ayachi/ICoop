@@ -8,11 +8,15 @@ import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.icoop.area.maps.OrbWay;
 import ch.epfl.cs107.icoop.area.maps.Spawn;
 import ch.epfl.cs107.play.areagame.AreaGame;
+import ch.epfl.cs107.play.areagame.actor.Interactor;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.signal.logic.Logic;
 import ch.epfl.cs107.play.window.Window;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public final class ICoop extends AreaGame {
@@ -42,7 +46,6 @@ public final class ICoop extends AreaGame {
             createAreas();
             areaIndex = 0;
             initArea(areas[areaIndex]);
-
             return true;
         }
         return false;
@@ -54,7 +57,14 @@ public final class ICoop extends AreaGame {
 
     @Override
     public void update(float deltaTime) {
+
         super.update(deltaTime);
+        if (player.isDoorPassed()){
+            String areakey = player.getCurrentDoor().getDestination();
+            DiscreteCoordinates coords = player.getCurrentDoor().getPlayerDestination().get(0);
+            switchArea(areakey, coords);
+        }
+        player.setDoorIsPassed(false);
     }
 
     @Override
@@ -86,10 +96,10 @@ public final class ICoop extends AreaGame {
      * switches from one area to the other
      * the player is healed when moving to a new area
      */
-    private void switchArea() {
+    private void switchArea(String areaKey, DiscreteCoordinates coords) {
         player.leaveArea();
         areaIndex = (areaIndex == 0) ? 1 : 0;
-        ICoopArea currentArea = (ICoopArea) setCurrentArea(areas[areaIndex], false);
-        player.enterArea(currentArea, currentArea.getPlayerSpawnPosition());
+        ICoopArea currentArea = (ICoopArea) setCurrentArea(areaKey, false);
+        player.enterArea(currentArea, coords);
     }
 }

@@ -34,6 +34,10 @@ public abstract class ICoopArea extends Area {
         return false;
     }
 
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+    }
     /**
      * Getter for Tuto2's scale factor
      * @return Scale factor in both the x-direction and the y-direction

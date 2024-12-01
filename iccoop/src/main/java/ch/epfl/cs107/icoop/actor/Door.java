@@ -1,18 +1,14 @@
 package ch.epfl.cs107.icoop.actor;
 
-import ch.epfl.cs107.icoop.area.ICoopBehavior;
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
 import ch.epfl.cs107.play.areagame.actor.AreaEntity;
-import ch.epfl.cs107.play.areagame.actor.Interactable;
-import ch.epfl.cs107.play.areagame.actor.Interactor;
 import ch.epfl.cs107.play.areagame.area.Area;
 import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
+import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.logic.Logic;
-import ch.epfl.cs107.play.window.Canvas;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +46,15 @@ public class Door extends AreaEntity {
         this.position = List.of(position);
     }
 
+    public String getDestination() {
+        return destination;
+    }
+
+    public List<DiscreteCoordinates> getPlayerDestination() {
+        return playerDestination;
+    }
+
+
     @Override
     public boolean takeCellSpace() {
         return false;
@@ -58,7 +63,6 @@ public class Door extends AreaEntity {
     @Override
     public boolean isCellInteractable() {
         return true;
-
     }
 
     @Override
@@ -67,13 +71,13 @@ public class Door extends AreaEntity {
     }
 
     @Override
-    public void acceptInteraction ( AreaInteractionVisitor v , boolean isCellInteraction ) {
-        ((ICoopInteractionVisitor) v). interactWith ( this ,isCellInteraction );
+    public void acceptInteraction (AreaInteractionVisitor v, boolean isCellInteraction ) {
+        ((ICoopInteractionVisitor) v).interactWith(this ,isCellInteraction );
     }
 
-    public void draw(Canvas canvas) {}
-
-
+    public boolean setDoorIsPassed(){
+        return true;
+    }
 
 }
 
