@@ -27,7 +27,7 @@ public class Bomb extends AreaEntity implements Interactor {
     private boolean isExploding = false;
     private boolean exploded = false;
 
-    private int bombTimer = 48;
+    private int bombTimer = 5*24 ;
 
     private BombInteractionHandler handler;
 
@@ -63,31 +63,39 @@ public class Bomb extends AreaEntity implements Interactor {
     @Override
     public void update(float deltatime) {
         super.update(deltatime);
-        explode();
+
 
         if (exploded && bombTimer==0) {
             explosionOn.update(deltatime);
-            tickBombTimer();
         }
         else if (isExploding) {
             explosionOff.update(deltatime);
             tickBombTimer();
-
         }
+        explode();
 
     }
 
     @Override
     public void draw (Canvas canvas) {
         super.draw(canvas);
-        if (exploded) {
+        //explosionOn.setSpeedFactor(50);
+
+        if (exploded && bombTimer==0) {
+
             explosionOn.draw(canvas);
+            explosionOn.update(48);
+            explosionOn.setSpeedFactor(1);
+
+
         }
 
-        else  {
+        else if(!exploded && bombTimer!=0)  {
             explosionOff.draw(canvas);
-        }
+            explosionOff.setSpeedFactor(1);
 
+
+        }
 
     }
 
