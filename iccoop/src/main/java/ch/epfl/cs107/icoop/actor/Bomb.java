@@ -10,6 +10,7 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.areagame.area.Area;
 import ch.epfl.cs107.play.window.Canvas;
+import ch.epfl.cs107.play.window.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,26 +56,39 @@ public class Bomb extends AreaEntity implements Interactor {
         if (isExploding && bombTimer==0) {
             exploded = true;
             isExploding = false;
+
         }
     }
 
     @Override
     public void update(float deltatime) {
         super.update(deltatime);
-        if (isExploding) {
+        explode();
+
+        if (exploded && bombTimer==0) {
+            explosionOn.update(deltatime);
             tickBombTimer();
         }
-        explode();
-    }
+        else if (isExploding) {
+            explosionOff.update(deltatime);
+            tickBombTimer();
 
+        }
+
+    }
 
     @Override
     public void draw (Canvas canvas) {
+        super.draw(canvas);
         if (exploded) {
             explosionOn.draw(canvas);
-        } else {
+        }
+
+        else  {
             explosionOff.draw(canvas);
         }
+
+
     }
 
     @Override
@@ -90,7 +104,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean isCellInteractable() {
-        if (exploded==true && isExploding==true) {
+        if (exploded && isExploding) {
             return true;
         }
         return false;
@@ -98,7 +112,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean isViewInteractable() {
-        if (exploded==false) {
+        if (!exploded) {
             return true;
         }
         return false;
