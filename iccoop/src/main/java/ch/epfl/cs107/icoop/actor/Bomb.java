@@ -64,7 +64,7 @@ public class Bomb extends AreaEntity implements Interactor {
     public void update(float deltatime) {
         super.update(deltatime);
 
-        if (exploded && bombTimer==0) {
+        if (exploded) {
             explosionOn.update(deltatime);
 
         }
@@ -86,7 +86,6 @@ public class Bomb extends AreaEntity implements Interactor {
 
         if (exploded && bombTimer==0 && !explosionOn.isCompleted()) {
             explosionOn.draw(canvas);
-            explosionOn.update(5*24);
         }
 
 
@@ -130,7 +129,6 @@ public class Bomb extends AreaEntity implements Interactor {
         ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
     }
 
-
     @Override
     public boolean wantsCellInteraction() {
         return false;
@@ -166,6 +164,8 @@ public class Bomb extends AreaEntity implements Interactor {
             if (interactable instanceof Rock) {
                 interactWith((Rock) interactable, isCellInteraction);
             }
+
+
         }
 
         @Override

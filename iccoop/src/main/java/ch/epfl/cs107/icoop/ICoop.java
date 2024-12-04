@@ -11,7 +11,11 @@ import ch.epfl.cs107.play.areagame.AreaGame;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
+
+import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Window;
+
+import java.security.Key;
 
 
 public final class ICoop extends AreaGame {
@@ -20,7 +24,9 @@ public final class ICoop extends AreaGame {
     private ICoopPlayer player1;
     private ICoopPlayer player2;
     private int areaIndex;
-    private CenterOfMass centerOfMass;
+
+
+
 
 
     /**
@@ -42,10 +48,8 @@ public final class ICoop extends AreaGame {
             createAreas();
             areaIndex = 0;
             initArea(areas[areaIndex]);
-            centerOfMass = new CenterOfMass(player1, player2);
-            getCurrentArea().setViewCandidate(centerOfMass);
-
             return true;
+
         }
         return false;
     }
@@ -58,18 +62,37 @@ public final class ICoop extends AreaGame {
     public void update(float deltaTime) {
         super.update(deltaTime);
         ICoopArea currentArea = (ICoopArea) getCurrentArea();
-        currentArea.setViewCandidate(centerOfMass);
+        CenterOfMass centerMassPlayers = new CenterOfMass(player1, player2);
+        getCurrentArea().setViewCandidate(centerMassPlayers);
+
+
         float defaultFactor = currentArea.getDefaultCameraScaleFactor();
         float distance = (player1.getPosition().sub(player2.getPosition()).getLength())/2;
         float newFactor = Math.max(defaultFactor, (float) (defaultFactor*0.75 + distance));
         currentArea.setCameraScaleFactor(newFactor);
+
+        Keyboard keyboard = getCurrentArea().getKeyboard();
+        if (keyboard.get(KeyBindings.RESET_GAME).isPressed()) {
+            getCurrentArea().unregisterActor(player1);
+            getCurrentArea().unregisterActor(player2);
+            initArea(areas[0]);
+        }
+
+        else if (keyboard.get(KeyBindings.RESET_AREA).isPressed()) {
+            getCurrentArea().unregisterActor(player1);
+            getCurrentArea().unregisterActor(player2);
+            initArea(getCurrentArea().getTitle());
+        }
+
+
+
 
 
         if (player1.isDoorPassed()){
             String areakey = player1.getCurrentDoor().getDestination();
             DiscreteCoordinates[] coords = player1.getCurrentDoor().getPlayerDestination();
             switchArea(areakey, coords);
-        }
+       }
         player1.setDoorIsPassed(false);
         if (player2.isDoorPassed()){
             String areakey = player2.getCurrentDoor().getDestination();
@@ -77,6 +100,8 @@ public final class ICoop extends AreaGame {
             switchArea(areakey, coords);
         }
         player2.setDoorIsPassed(false);
+
+
     }
 
     @Override
@@ -100,6 +125,8 @@ public final class ICoop extends AreaGame {
         player2 = new ICoopPlayer(area, Orientation.DOWN, coords[1], ElementalEntity.Element.WATER, "icoop/player2");
         player1.enterArea(area, coords[0]);
         player2.enterArea(area, coords[1]);
+
+
     }
 
     /**

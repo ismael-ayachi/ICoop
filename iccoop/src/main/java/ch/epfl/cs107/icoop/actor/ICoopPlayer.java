@@ -68,6 +68,8 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
      */
     @Override
     public void update(float deltaTime) {
+        super.update(deltaTime);
+
         if (isDisplacementOccurs()) {
             animation.update(deltaTime);
         } else {
@@ -78,7 +80,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         moveIfPressed(UP, keyboard.get(keys.up()));
         moveIfPressed(RIGHT, keyboard.get(keys.right()));
         moveIfPressed(DOWN, keyboard.get(keys.down()));
-        super.update(deltaTime);
+
 
     }
 
@@ -197,9 +199,11 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     /**
      * Center the camera on the player
      */
-    public void centerCamera() {
+    /*public void centerCamera() {
         getOwnerArea().setViewCandidate(this);
     }
+
+     */
 
     @Override
     public Element element() {
