@@ -31,8 +31,8 @@ import static ch.epfl.cs107.play.math.Orientation.*;
  */
 public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor, Interactable {
     private final Element element;
-    private final String prefix;
     private final static int ANIMATION_DURATION = 4;
+    private final static int MOVE_DURATION = 8;
     final Vector anchor = new Vector(0, 0);
     final Orientation[] orders = {DOWN, RIGHT, UP, LEFT};
     private OrientedAnimation animation;
@@ -50,7 +50,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     public ICoopPlayer(Area owner, Orientation orientation, DiscreteCoordinates coordinates, Element element, String prefix) {
         super(owner, orientation, coordinates);
         this.element = element;
-        this.prefix = prefix;
         if (prefix == "icoop/player") {
             keys = KeyBindings.RED_PLAYER_KEY_BINDINGS;
         } else if (prefix == "icoop/player2") {
@@ -72,11 +71,9 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
         if (isDisplacementOccurs()) {
             animation.update(deltaTime);
-        } else {
-            animation.reset();
         }
         Keyboard keyboard = getOwnerArea().getKeyboard();
-        moveIfPressed(Orientation.LEFT, keyboard.get(keys.left()));
+        moveIfPressed(LEFT, keyboard.get(keys.left()));
         moveIfPressed(UP, keyboard.get(keys.up()));
         moveIfPressed(RIGHT, keyboard.get(keys.right()));
         moveIfPressed(DOWN, keyboard.get(keys.down()));
@@ -88,10 +85,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
      * @param canvas target, not null
      */
     @Override
-    public void draw(ch.epfl.cs107.play.window.Canvas canvas) {
-        animation.draw(canvas);
-
-
+    public void draw(ch.epfl.cs107.play.window.Canvas canvas) {animation.draw(canvas);
     }
 
     @Override
@@ -170,7 +164,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         if (b.isDown()) {
             if (!isDisplacementOccurs()) {
                 orientate(orientation);
-                move(ANIMATION_DURATION);
+                move(MOVE_DURATION);
             }
         }
     }

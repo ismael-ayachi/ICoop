@@ -26,9 +26,6 @@ public final class ICoop extends AreaGame {
     private int areaIndex;
 
 
-
-
-
     /**
      * Add all the Tuto2 areas
      */
@@ -70,7 +67,6 @@ public final class ICoop extends AreaGame {
         float distance = (player1.getPosition().sub(player2.getPosition()).getLength())/2;
         float newFactor = Math.max(defaultFactor, (float) (defaultFactor*0.75 + distance));
         currentArea.setCameraScaleFactor(newFactor);
-
         Keyboard keyboard = getCurrentArea().getKeyboard();
         if (keyboard.get(KeyBindings.RESET_GAME).isPressed()) {
             getCurrentArea().unregisterActor(player1);
@@ -83,10 +79,6 @@ public final class ICoop extends AreaGame {
             getCurrentArea().unregisterActor(player2);
             initArea(getCurrentArea().getTitle());
         }
-
-
-
-
 
         if (player1.isDoorPassed()){
             String areakey = player1.getCurrentDoor().getDestination();

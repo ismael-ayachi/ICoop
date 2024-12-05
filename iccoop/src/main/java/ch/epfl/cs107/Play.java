@@ -30,7 +30,7 @@ public class Play {
         // Create a demo game and initialize corresponding texts
 		final Game game = new ICoop();
 
-        // Use Swing displayz
+        // Use Swing display
 		final Window window = new SwingWindow(game.getTitle(), fileSystem, WINDOW_WIDTH, WINDOW_HEIGHT);
 		window.registerFonts(ResourcePath.FONTS);
 
