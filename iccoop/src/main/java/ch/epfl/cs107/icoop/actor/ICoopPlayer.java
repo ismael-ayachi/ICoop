@@ -68,7 +68,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-
         if (isDisplacementOccurs()) {
             animation.update(deltaTime);
         }
@@ -77,8 +76,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         moveIfPressed(UP, keyboard.get(keys.up()));
         moveIfPressed(RIGHT, keyboard.get(keys.right()));
         moveIfPressed(DOWN, keyboard.get(keys.down()));
-
-
     }
 
     /**
@@ -125,7 +122,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
-        handler.interactWith(other, isCellInteraction);
+        other.acceptInteraction(handler,isCellInteraction);
     }
 
     public void setCurrentDoor(Door door){
@@ -193,11 +190,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     /**
      * Center the camera on the player
      */
-    /*public void centerCamera() {
-        getOwnerArea().setViewCandidate(this);
-    }
-
-     */
 
     @Override
     public Element element() {
@@ -205,17 +197,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     }
 
     private class ICoopPlayerInteractionHandler implements ICoopInteractionVisitor {
-
-        @Override
-        public void interactWith(Interactable interactable, boolean isCellInteraction) {
-            if (interactable instanceof Door){
-                interactWith((Door) interactable, isCellInteraction);
-            }
-
-            if (interactable instanceof Bomb) {
-                interactWith((Bomb) interactable, isCellInteraction);
-            }
-        }
 
         @Override
         public void interactWith(Door door, boolean isCellInteraction) {

@@ -144,7 +144,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
-        handler.interactWith(other, isCellInteraction);
+        other.acceptInteraction(handler, isCellInteraction);
     }
 
     @Override
@@ -158,15 +158,6 @@ public class Bomb extends AreaEntity implements Interactor {
     }
 
     private class BombInteractionHandler implements ICoopInteractionVisitor {
-
-        @Override
-        public void interactWith(Interactable interactable, boolean isCellInteraction) {
-            if (interactable instanceof Rock) {
-                interactWith((Rock) interactable, isCellInteraction);
-            }
-
-
-        }
 
         @Override
         public void interactWith(Rock rock, boolean isCellInteraction) {
