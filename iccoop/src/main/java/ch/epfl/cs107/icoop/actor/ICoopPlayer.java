@@ -31,13 +31,23 @@ import static ch.epfl.cs107.play.math.Orientation.*;
  */
 public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor, Interactable {
     private final Element element;
+    public final DamageType immunity = DamageType.WATER;
+
+    private final static int MAX_LIFE = 5;
+    private Health hp;
+    private final static int IFRAMES = 24;
+    private int timer;
+
     private final static int ANIMATION_DURATION = 4;
     private final static int MOVE_DURATION = 8;
+
     final Vector anchor = new Vector(0, 0);
     final Orientation[] orders = {DOWN, RIGHT, UP, LEFT};
     private OrientedAnimation animation;
     private KeyBindings.PlayerKeyBindings keys = KeyBindings.RED_PLAYER_KEY_BINDINGS;
+
     private ICoopPlayerInteractionHandler handler;
+
     private Door currentDoor;
     private boolean doorIsPassed;
 
@@ -76,6 +86,11 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         moveIfPressed(UP, keyboard.get(keys.up()));
         moveIfPressed(RIGHT, keyboard.get(keys.right()));
         moveIfPressed(DOWN, keyboard.get(keys.down()));
+
+        if (timer > 0) {
+            timer--;
+        }
+
     }
 
     /**
@@ -196,6 +211,27 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         return this.element;
     }
 
+    public void resetHealth() {
+        hp.resetHealth();
+    }
+
+    public boolean invincible() {
+        return !(timer == 0);
+    }
+
+    public void damage(DamageType damageType, int damage) {
+        if (damageType != immunity && !invincible() && hp.isOn()) {
+            timer = IFRAMES;
+            hp.decrease(damage);
+        }
+    }
+
+    public boolean isDead() {
+        return hp.isOff();
+    }
+
+
+
     private class ICoopPlayerInteractionHandler implements ICoopInteractionVisitor {
 
         @Override
@@ -207,7 +243,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         }
 
         @Override
-        public void interactWith(Bomb bomb, boolean isCellInteraction) {
+        public void interactWith(Bomb bomb, boolean isViewInteraction) {
             bomb.activate();
         }
     }

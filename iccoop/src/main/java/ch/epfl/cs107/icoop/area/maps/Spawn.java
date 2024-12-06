@@ -11,6 +11,7 @@ import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.signal.logic.Logic;
 
 public class Spawn extends ICoopArea {
+
     /**
      * @return the player's spawn position in the area
      */
@@ -21,6 +22,7 @@ public class Spawn extends ICoopArea {
 
     @Override
     protected void createArea() {
+        setDialog(new Dialog("welcome"));
         registerActor(new Background(this));
         registerActor(new Foreground(this));
         registerActor(new Door(this, "OrbWay", Logic.TRUE, new DiscreteCoordinates(1,12),

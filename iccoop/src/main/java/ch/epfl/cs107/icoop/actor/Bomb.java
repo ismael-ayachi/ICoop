@@ -12,6 +12,7 @@ import ch.epfl.cs107.play.areagame.area.Area;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,9 @@ public class Bomb extends AreaEntity implements Interactor {
             ANIMATION_DURATION /2 , true );
     private final Animation explosionOn = new Animation ("icoop/explosion", 7, 1, 1, this , 32 , 32 ,
             ANIMATION_DURATION /7 , false );
+
+    private static final DamageType DAMAGE_TYPE = DamageType.PHYSICAL;
+    private static final int DAMAGE_QUANTITY = 2;
 
     private boolean isExploding = false;
     private boolean exploded = false;
@@ -56,7 +60,6 @@ public class Bomb extends AreaEntity implements Interactor {
         if (isExploding && bombTimer==0) {
             exploded = true;
             isExploding = false;
-
         }
     }
 
@@ -66,7 +69,9 @@ public class Bomb extends AreaEntity implements Interactor {
 
         if (exploded) {
             explosionOn.update(deltatime);
-
+            if (explosionOn.isCompleted()) {
+                getOwnerArea().unregisterActor(this);
+            }
         }
 
         else if (isExploding) {
@@ -81,20 +86,14 @@ public class Bomb extends AreaEntity implements Interactor {
     @Override
     public void draw (Canvas canvas) {
         super.draw(canvas);
-        //explosionOn.setSpeedFactor(50);
-
 
         if (exploded && bombTimer==0 && !explosionOn.isCompleted()) {
             explosionOn.draw(canvas);
         }
 
-
         else if(!exploded && bombTimer!=0 && !explosionOff.isCompleted())  {
             explosionOff.draw(canvas);
-            //explosionOff.setSpeedFactor(1);
         }
-
-
     }
 
     @Override
@@ -154,14 +153,18 @@ public class Bomb extends AreaEntity implements Interactor {
             fieldOfViewCells.add(getCurrentMainCellCoordinates().jump(orientation.toVector()));
         }
         return fieldOfViewCells;
-
     }
 
     private class BombInteractionHandler implements ICoopInteractionVisitor {
 
         @Override
-        public void interactWith(Rock rock, boolean isCellInteraction) {
+        public void interactWith(Rock rock, boolean isViewInteraction) {
             rock.destroy();
+        }
+
+        @Override
+        public void interactWith(ICoopPlayer player, boolean isViewInteraction) {
+            player.damage(DAMAGE_TYPE,DAMAGE_QUANTITY);
         }
     }
 }
