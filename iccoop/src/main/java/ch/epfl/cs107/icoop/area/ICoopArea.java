@@ -11,7 +11,6 @@ public abstract class ICoopArea extends Area {
     public final static float DEFAULT_SCALE_FACTOR = 13.f;
     private float cameraScaleFactor = DEFAULT_SCALE_FACTOR;
 
-    private Dialog dialog;
     /**
      * Area specific callback to initialise the instance
      */
@@ -61,12 +60,4 @@ public abstract class ICoopArea extends Area {
 
     @Override
     public boolean isViewCentered () { return false ; }
-
-    public Dialog getDialog(){
-        return dialog;
-    }
-
-    public void setDialog(Dialog dialog) {
-        this.dialog = dialog;
-    }
 }

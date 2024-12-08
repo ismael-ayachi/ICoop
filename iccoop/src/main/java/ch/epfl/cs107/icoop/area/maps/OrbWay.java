@@ -1,15 +1,26 @@
 package ch.epfl.cs107.icoop.area.maps;
 
 import ch.epfl.cs107.icoop.actor.Door;
+import ch.epfl.cs107.icoop.actor.ElementalEntity;
 import ch.epfl.cs107.icoop.actor.ICoopPlayer;
+import ch.epfl.cs107.icoop.actor.Orb;
 import ch.epfl.cs107.icoop.area.ICoopArea;
+import ch.epfl.cs107.icoop.handler.DialogHandler;
 import ch.epfl.cs107.play.engine.actor.Background;
+import ch.epfl.cs107.play.engine.actor.Dialog;
 import ch.epfl.cs107.play.engine.actor.Foreground;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.logic.Logic;
 
 public class OrbWay extends ICoopArea {
+    private DialogHandler dialogHandler;
+
+    public OrbWay(DialogHandler handler){
+        super();
+        dialogHandler = handler;
+    }
+
     @Override
     public DiscreteCoordinates[] getPlayerSpawnPosition() {
         return new DiscreteCoordinates[]{new DiscreteCoordinates(1, 12), new DiscreteCoordinates(1,5)};
@@ -17,6 +28,8 @@ public class OrbWay extends ICoopArea {
 
     @Override
     protected void createArea() {
+        registerActor(new Orb(this,new DiscreteCoordinates(17,12), ElementalEntity.Element.FIRE, dialogHandler));
+        registerActor(new Orb(this,new DiscreteCoordinates(17,6), ElementalEntity.Element.WATER, dialogHandler));
         registerActor(new Background(this));
         registerActor(new Foreground(this));
         registerActor(new Door(this, "Spawn", Logic.TRUE, new DiscreteCoordinates(18,16), new DiscreteCoordinates(18,15),

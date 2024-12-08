@@ -7,33 +7,37 @@ import ch.epfl.cs107.icoop.actor.ICoopPlayer;
 import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.icoop.area.maps.OrbWay;
 import ch.epfl.cs107.icoop.area.maps.Spawn;
+import ch.epfl.cs107.icoop.handler.DialogHandler;
 import ch.epfl.cs107.play.areagame.AreaGame;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 
+import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Window;
+import ch.epfl.cs107.play.engine.actor.Dialog;
 
 import java.security.Key;
 
 
-public final class ICoop extends AreaGame {
+public final class ICoop extends AreaGame implements DialogHandler {
 
     private final String[] areas = {"Spawn", "OrbWay"};
     private int areaIndex;
 
     private ICoopPlayer player1;
     private ICoopPlayer player2;
-    private int areaIndex;
+
+    private Dialog activeDialog;
 
 
     /**
      * Add all the Tuto2 areas
      */
     private void createAreas() {
-        addArea(new Spawn());
-        addArea(new OrbWay());
+        addArea(new Spawn(this));
+        addArea(new OrbWay(this));
     }
 
     /**
@@ -70,13 +74,10 @@ public final class ICoop extends AreaGame {
         if (activeDialog == null) {
             super.update(deltaTime);
 
-            activeDialog = ((ICoopArea) getCurrentArea()).getDialog();
-            ((ICoopArea) getCurrentArea()).setDialog(null);
-
             if (keyboard.get(KeyBindings.RESET_GAME).isPressed()) {
                 begin(getWindow(), getFileSystem());
             } else if (keyboard.get(KeyBindings.RESET_AREA).isPressed() || player1.isDead() || player2.isDead()) {
-                resetArea(getCurrentArea().getTitle());
+                resetArea();
             }
 
             if (player1.isDoorPassed()) {
@@ -104,9 +105,15 @@ public final class ICoop extends AreaGame {
     }
 
     @Override
+    public void publish(Dialog dialog) {
+        this.activeDialog = dialog;
+    }
+
+    @Override
     public void end() {
 
     }
+
 
     @Override
     public String getTitle() {
@@ -138,9 +145,13 @@ public final class ICoop extends AreaGame {
         player2.enterArea(currentArea, coords[1]);
     }
 
-    private void resetArea(String areaKey) {
+    private void resetArea() {
         DiscreteCoordinates coords[] = ((ICoopArea) getCurrentArea()).getPlayerSpawnPosition();
-        switchArea(areaKey, coords, true);
+        switchArea(getCurrentArea().getTitle(), coords, true);
+        if (player1.isDead() || player2.isDead()) {
+            player1.resetHealth();
+            player2.resetHealth();
+        }
     }
 
 

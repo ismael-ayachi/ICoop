@@ -31,7 +31,7 @@ import static ch.epfl.cs107.play.math.Orientation.*;
  */
 public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor, Interactable {
     private final Element element;
-    public final DamageType immunity = DamageType.WATER;
+    private DamageType immunity;
 
     private final static int MAX_LIFE = 5;
     private Health hp;
@@ -41,8 +41,8 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     private final static int ANIMATION_DURATION = 4;
     private final static int MOVE_DURATION = 8;
 
-    final Vector anchor = new Vector(0, 0);
-    final Orientation[] orders = {DOWN, RIGHT, UP, LEFT};
+    private final Vector anchor = new Vector(0, 0);
+    private final Orientation[] orders = {DOWN, RIGHT, UP, LEFT};
     private OrientedAnimation animation;
     private KeyBindings.PlayerKeyBindings keys = KeyBindings.RED_PLAYER_KEY_BINDINGS;
 
@@ -140,6 +140,10 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         other.acceptInteraction(handler,isCellInteraction);
     }
 
+    public void interactWith(ElementalItem other, boolean isCellInteraction){
+        other.acceptInteraction(handler, isCellInteraction);
+    }
+
     public void setCurrentDoor(Door door){
         this.currentDoor = door;
     }
@@ -207,7 +211,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
      */
 
     @Override
-    public Element element() {
+    public ElementalEntity.Element element() {
         return this.element;
     }
 
@@ -243,8 +247,28 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         }
 
         @Override
-        public void interactWith(Bomb bomb, boolean isViewInteraction) {
-            bomb.activate();
+        public void interactWith(Bomb bomb, boolean isCellInteraction) {
+            if (isCellInteraction) {
+                bomb.collect();
+            } else {
+                bomb.activate();
+            }
+        }
+
+        @Override
+        public void interactWith(Orb orb, boolean isCellInteraction) {
+            orb.collect();
+            if (orb.element()==Element.FIRE){
+                immunity = DamageType.FIRE;
+            }
+            else if (orb.element()==Element.WATER){
+                immunity = DamageType.WATER;
+            }
+        }
+
+        @Override
+        public Element element() {
+            return element;
         }
     }
 }

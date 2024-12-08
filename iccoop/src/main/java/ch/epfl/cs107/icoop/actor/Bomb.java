@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Bomb extends AreaEntity implements Interactor {
+public class Bomb extends ICoopCollectable implements Interactor {
 
     private static final int ANIMATION_DURATION = 24;
     private final Animation explosionOff = new Animation ("icoop/explosive", 2, 1, 1, this , 16 , 16 ,
@@ -54,7 +54,12 @@ public class Bomb extends AreaEntity implements Interactor {
         this.bombTimer--;
     }
 
-
+    public void collect() {
+        super.collect();
+        if (!(isExploding||exploded)) {
+            getOwnerArea().unregisterActor(this);
+        }
+    }
 
     public void explode() {
         if (isExploding && bombTimer==0) {
@@ -80,7 +85,6 @@ public class Bomb extends AreaEntity implements Interactor {
         }
         explode();
 
-
     }
 
     @Override
@@ -103,24 +107,13 @@ public class Bomb extends AreaEntity implements Interactor {
     }
 
     @Override
-    public boolean takeCellSpace() {
-        return false;
-    }
-
-    @Override
     public boolean isCellInteractable() {
-        if (exploded && isExploding) {
-            return true;
-        }
-        return false;
+        return !(exploded || isExploding);
     }
 
     @Override
     public boolean isViewInteractable() {
-        if (!exploded) {
-            return true;
-        }
-        return false;
+        return !(exploded||isExploding);
     }
 
     @Override
@@ -130,15 +123,12 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean wantsCellInteraction() {
-        return false;
+        return exploded;
     }
 
     @Override
     public boolean wantsViewInteraction() {
-        if (exploded) {
-            return true;
-        }
-        return false;
+        return exploded;
     }
 
     @Override
