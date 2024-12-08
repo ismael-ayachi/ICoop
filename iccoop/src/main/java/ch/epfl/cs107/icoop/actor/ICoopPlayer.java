@@ -10,11 +10,13 @@ import ch.epfl.cs107.play.areagame.actor.Interactor;
 import ch.epfl.cs107.play.areagame.actor.MovableAreaEntity;
 import ch.epfl.cs107.play.areagame.area.Area;
 import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.engine.actor.Actor;
 import ch.epfl.cs107.play.engine.actor.OrientedAnimation;
 import ch.epfl.cs107.play.engine.actor.Sprite;
 import ch.epfl.cs107.play.engine.actor.TextGraphics;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
+import ch.epfl.cs107.play.math.Transform;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.Signal;
 import ch.epfl.cs107.play.window.Button;
@@ -70,6 +72,8 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
                 true);
         resetMotion();
         handler = new ICoopPlayerInteractionHandler();
+        this.hp = new Health ( this , Transform.I. translated (0 , 1.75f) , MAX_LIFE ,
+                true );
     }
 
     /**
@@ -91,13 +95,17 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
             timer--;
         }
 
+
+
     }
 
     /**
      * @param canvas target, not null
      */
     @Override
-    public void draw(ch.epfl.cs107.play.window.Canvas canvas) {animation.draw(canvas);
+    public void draw(ch.epfl.cs107.play.window.Canvas canvas) {
+        animation.draw(canvas);
+        hp.draw(canvas);
     }
 
     @Override
@@ -128,16 +136,13 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     @Override
     public boolean wantsViewInteraction() {
         Keyboard keyboard = getOwnerArea().getKeyboard();
-        if (keyboard.get(keys.useItem()).isPressed()) {
-            return true;
-        }
-        return false;
-
+        return (keyboard.get(keys.useItem()).isPressed());
     }
 
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
         other.acceptInteraction(handler,isCellInteraction);
+
     }
 
     public void setCurrentDoor(Door door){
@@ -149,7 +154,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     }
 
     public void setDoorIsPassed(boolean doorIsPassed){
-        this.doorIsPassed=doorIsPassed;
+        this.doorIsPassed = doorIsPassed;
     }
 
     public boolean isDoorPassed(){
@@ -159,6 +164,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     @Override
     public void acceptInteraction(AreaInteractionVisitor v, boolean isCellInteraction) {
         ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
+
     }
 
     @Override
@@ -219,6 +225,8 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         return !(timer == 0);
     }
 
+
+
     public void damage(DamageType damageType, int damage) {
         if (damageType != immunity && !invincible() && hp.isOn()) {
             timer = IFRAMES;
@@ -229,7 +237,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     public boolean isDead() {
         return hp.isOff();
     }
-
 
 
     private class ICoopPlayerInteractionHandler implements ICoopInteractionVisitor {
@@ -243,9 +250,38 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         }
 
         @Override
-        public void interactWith(Bomb bomb, boolean isViewInteraction) {
-            bomb.activate();
+        public void interactWith(Bomb bomb, boolean isCellInteraction) {
+            if (!isCellInteraction) {
+              bomb.activate();
+            }
+            else {
+                bomb.collect();
+            }
         }
+
+        /*@Override
+        public void interactWith(ICoopCollectable other, boolean isCellInteraction) {
+            if (other instanceof Bomb) {
+                other.collect();
+            }
+            System.out.println("test3");
+
+
+
+
+        }
+
+         */
+
+
+
+
+
+
+
+
+
+
     }
 }
 

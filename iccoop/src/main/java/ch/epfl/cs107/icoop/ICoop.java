@@ -8,6 +8,7 @@ import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.icoop.area.maps.OrbWay;
 import ch.epfl.cs107.icoop.area.maps.Spawn;
 import ch.epfl.cs107.play.areagame.AreaGame;
+import ch.epfl.cs107.play.engine.actor.Dialog;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
@@ -25,7 +26,8 @@ public final class ICoop extends AreaGame {
 
     private ICoopPlayer player1;
     private ICoopPlayer player2;
-    private int areaIndex;
+    //private int areaIndex;
+    private Dialog activeDialog;
 
 
     /**
@@ -101,6 +103,8 @@ public final class ICoop extends AreaGame {
                 activeDialog=null;
             }
         }
+
+
     }
 
     @Override

@@ -16,12 +16,14 @@ public interface ICoopInteractionVisitor extends AreaInteractionVisitor {
     default void interactWith(ICoopBehavior.ICoopCell cell, boolean isCellInteraction) {}
     
     default void interactWith(ICoopPlayer player, boolean isCellInteraction) {}
-    
+
     default void interactWith(Door door, boolean isCellInteraction) {}
+    default void interactWith(ICoopCollectable other, boolean isCellInteraction) {}
 
     default void interactWith(Bomb bomb, boolean isCellInteraction) {}
 
     default void interactWith(Obstacle obstacle, boolean isCellInteraction) {}
+
 
     default void interactWith(Rock rock, boolean isCellInteraction) {}
 

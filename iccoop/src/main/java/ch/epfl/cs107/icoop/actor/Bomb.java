@@ -1,5 +1,6 @@
 package ch.epfl.cs107.icoop.actor;
 
+import ch.epfl.cs107.icoop.area.ICoopBehavior;
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
 import ch.epfl.cs107.play.areagame.actor.AreaEntity;
 import ch.epfl.cs107.play.areagame.actor.Interactable;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Bomb extends AreaEntity implements Interactor {
+public class Bomb extends ICoopCollectable implements Interactor {
 
     private static final int ANIMATION_DURATION = 24;
     private final Animation explosionOff = new Animation ("icoop/explosive", 2, 1, 1, this , 16 , 16 ,
@@ -78,7 +79,10 @@ public class Bomb extends AreaEntity implements Interactor {
             explosionOff.update(deltatime);
             tickBombTimer();
         }
+
+
         explode();
+
 
 
     }
@@ -87,13 +91,14 @@ public class Bomb extends AreaEntity implements Interactor {
     public void draw (Canvas canvas) {
         super.draw(canvas);
 
-        if (exploded && bombTimer==0 && !explosionOn.isCompleted()) {
+        if (exploded && bombTimer==0 && !explosionOn.isCompleted() ) {
             explosionOn.draw(canvas);
         }
 
-        else if(!exploded && bombTimer!=0 && !explosionOff.isCompleted())  {
+        else if(!exploded && bombTimer!=0 && !explosionOff.isCompleted() )  {
             explosionOff.draw(canvas);
         }
+
     }
 
     @Override
@@ -109,7 +114,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean isCellInteractable() {
-        if (exploded && isExploding) {
+        if (!exploded && !isExploding) {
             return true;
         }
         return false;
@@ -147,6 +152,17 @@ public class Bomb extends AreaEntity implements Interactor {
     }
 
     @Override
+    public void collect() {
+        super.collect();
+        if (!isExploding){
+            getOwnerArea().unregisterActor(this);
+        }
+
+
+    }
+
+
+    @Override
     public List<DiscreteCoordinates> getFieldOfViewCells() {
         List<DiscreteCoordinates> fieldOfViewCells = new ArrayList<>();
         for(Orientation orientation : Orientation.values()) {
@@ -154,6 +170,7 @@ public class Bomb extends AreaEntity implements Interactor {
         }
         return fieldOfViewCells;
     }
+
 
     private class BombInteractionHandler implements ICoopInteractionVisitor {
 
@@ -166,5 +183,10 @@ public class Bomb extends AreaEntity implements Interactor {
         public void interactWith(ICoopPlayer player, boolean isViewInteraction) {
             player.damage(DAMAGE_TYPE,DAMAGE_QUANTITY);
         }
+
     }
-}
+
+
+
+
+    }

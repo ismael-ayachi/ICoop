@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Represents Interactor object (i.e. it can interact with some Interactable)
- * @see Interactable
+ * @see Interactablea
  * This interface makes sense only in the "Area Context" with Actor contained into Area Cell
  */
 public interface Interactor {
