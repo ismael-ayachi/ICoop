@@ -15,6 +15,7 @@ import ch.epfl.cs107.play.engine.actor.Sprite;
 import ch.epfl.cs107.play.engine.actor.TextGraphics;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
+import ch.epfl.cs107.play.math.Transform;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.Signal;
 import ch.epfl.cs107.play.window.Button;
@@ -70,6 +71,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
                 true);
         resetMotion();
         handler = new ICoopPlayerInteractionHandler();
+        this.hp= new Health(this,Transform.I.translated(0,1.75f),MAX_LIFE,true);
     }
 
     /**
@@ -90,14 +92,17 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         if (timer > 0) {
             timer--;
         }
-
     }
 
     /**
      * @param canvas target, not null
      */
     @Override
-    public void draw(ch.epfl.cs107.play.window.Canvas canvas) {animation.draw(canvas);
+    public void draw(ch.epfl.cs107.play.window.Canvas canvas) {
+        if (timer%3==0) {
+            animation.draw(canvas);
+        }
+        hp.draw(canvas);
     }
 
     @Override
@@ -138,10 +143,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
         other.acceptInteraction(handler,isCellInteraction);
-    }
-
-    public void interactWith(ElementalItem other, boolean isCellInteraction){
-        other.acceptInteraction(handler, isCellInteraction);
     }
 
     public void setCurrentDoor(Door door){
