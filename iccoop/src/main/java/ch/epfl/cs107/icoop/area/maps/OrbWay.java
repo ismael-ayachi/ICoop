@@ -1,17 +1,20 @@
 package ch.epfl.cs107.icoop.area.maps;
 
-import ch.epfl.cs107.icoop.actor.Door;
-import ch.epfl.cs107.icoop.actor.ElementalEntity;
-import ch.epfl.cs107.icoop.actor.ICoopPlayer;
-import ch.epfl.cs107.icoop.actor.Orb;
+import ch.epfl.cs107.icoop.actor.*;
 import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.icoop.handler.DialogHandler;
+import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.engine.actor.Background;
 import ch.epfl.cs107.play.engine.actor.Dialog;
 import ch.epfl.cs107.play.engine.actor.Foreground;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.logic.Logic;
+
+import java.util.List;
+
+import static ch.epfl.cs107.play.math.Orientation.LEFT;
 
 public class OrbWay extends ICoopArea {
     private DialogHandler dialogHandler;
@@ -36,7 +39,19 @@ public class OrbWay extends ICoopArea {
                 new DiscreteCoordinates(0,14), new DiscreteCoordinates(0,13), new DiscreteCoordinates(0,12), new DiscreteCoordinates(0,11), new DiscreteCoordinates(0,10)));
         registerActor(new Door(this, "Spawn", Logic.TRUE, new DiscreteCoordinates(18,16), new DiscreteCoordinates(18,15),
                 new DiscreteCoordinates(0,8), new DiscreteCoordinates(0,7), new DiscreteCoordinates(0,6), new DiscreteCoordinates(0,5), new DiscreteCoordinates(0,4)));
+
+        for (int i=0; i<5; i++) {
+            registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(12, 10+i) , "fire_wall"));
+            registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(12, 4+i) , "water_wall"));
+        }
+        registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(7, 12) , "water_wall"));
+        registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(7, 6) , "fire_wall"));
+
+
+
+
     }
+
 
 
     @Override

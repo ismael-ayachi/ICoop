@@ -30,7 +30,7 @@ import static ch.epfl.cs107.play.math.Orientation.*;
 /**
  * A ICoopPlayer is a player for the ICoop game.
  */
-public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor, Interactable {
+public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor {
     private final Element element;
     private DamageType immunity;
 
@@ -164,6 +164,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     @Override
     public void acceptInteraction(AreaInteractionVisitor v, boolean isCellInteraction) {
         ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
+
     }
 
     @Override
@@ -225,7 +226,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     }
 
     public void damage(DamageType damageType, int damage) {
-        if (damageType != immunity && !invincible() && hp.isOn()) {
+        if (damageType!=immunity && !invincible() && hp.isOn()) {
             timer = IFRAMES;
             hp.decrease(damage);
         }
@@ -268,9 +269,16 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         }
 
         @Override
+        public void interactWith(ElementalWall wall, boolean isCellInteraction) {
+            System.out.println("aaaaa");
+        }
+
+        @Override
         public Element element() {
             return element;
         }
+
+
     }
 }
 
