@@ -12,14 +12,9 @@ import ch.epfl.cs107.play.areagame.AreaGame;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
-
-import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Window;
 import ch.epfl.cs107.play.engine.actor.Dialog;
-
-import java.security.Key;
-
 
 public final class ICoop extends AreaGame implements DialogHandler {
 

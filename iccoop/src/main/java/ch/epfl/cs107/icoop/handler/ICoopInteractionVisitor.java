@@ -2,8 +2,6 @@ package ch.epfl.cs107.icoop.handler;
 
 import ch.epfl.cs107.icoop.actor.*;
 import ch.epfl.cs107.icoop.area.ICoopBehavior;
-import ch.epfl.cs107.play.areagame.actor.Interactable;
-import ch.epfl.cs107.play.areagame.actor.Interactor;
 import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
 
 /**

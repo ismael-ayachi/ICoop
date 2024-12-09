@@ -1,7 +1,5 @@
 package ch.epfl.cs107.icoop.actor;
 
-import ch.epfl.cs107.icoop.KeyBindings;
-import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.icoop.handler.DialogHandler;
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
 import ch.epfl.cs107.play.areagame.area.Area;
@@ -14,8 +12,6 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.window.Canvas;
-import ch.epfl.cs107.play.window.Keyboard;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -25,13 +21,12 @@ public class Orb extends ElementalItem {
     private final static int ANIMATION_FRAMES = 6;
     private static int spriteYDelta;
     final Sprite[] sprites = new Sprite [ ANIMATION_FRAMES ];
-    private Animation orbAnimation;
+    private final Animation orbAnimation;
 
     private Dialog orbDialog;
-    private Keyboard keyboard = getOwnerArea().getKeyboard();
 
-    private Element element;
-    private DialogHandler dialogHandler;
+    private final Element element;
+    private final DialogHandler dialogHandler;
 
 
     public Orb(Area area, DiscreteCoordinates position, Element element, DialogHandler handler) {

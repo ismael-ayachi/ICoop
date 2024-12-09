@@ -11,7 +11,7 @@ import java.util.List;
 
 public abstract class ElementalItem extends ICoopCollectable implements ElementalEntity,Logic {
 
-    private Element element;
+    private final Element element;
 
     public ElementalItem(Area area, Orientation orientation, DiscreteCoordinates position, Element element) {
         super(area, orientation, position);
@@ -19,7 +19,7 @@ public abstract class ElementalItem extends ICoopCollectable implements Elementa
     }
 
     public boolean isSameElement(AreaInteractionVisitor v) {
-        return ((ICoopInteractionVisitor) v).element().equals(element);
+        return ((ICoopInteractionVisitor) v).element() == element;
     }
 
     @Override
