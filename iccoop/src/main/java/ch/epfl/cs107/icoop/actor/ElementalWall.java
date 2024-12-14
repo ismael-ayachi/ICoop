@@ -14,27 +14,46 @@ import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.logic.Logic;
 import ch.epfl.cs107.play.window.Canvas;
 
+import java.util.Collections;
 import java.util.List;
 
-public class ElementalWall extends AreaEntity implements ElementalEntity, Logic, Interactor {
+public class ElementalWall extends AreaEntity implements ElementalEntity, Interactor {
     private final Sprite[] wallSprites;
-    private Element element;
+
+    private final Element element;
+    private final DamageType damageType;
     private static final int DAMAGE_QUANTITY = 1;
-    private ElementalWallInteractionHandler handler;
 
-    public ElementalWall(Area area, Orientation orientation, DiscreteCoordinates position, String spriteName) {
-        super(area, orientation, position);
-        wallSprites = RPGSprite.extractSprites (spriteName, 4, 1, 1,  this ,
-                Vector.ZERO , 256 , 256);
+    private final ElementalWallInteractionHandler handler;
 
-        switch (spriteName) {
-            case "fire_wall":
-                element = Element.FIRE;
-                break;
-            case "water_wall":
-                element = Element.WATER;
-                break;
+    private final Logic logicKey;
+
+    public enum WallType {
+        FIRE_WALL("fire_wall", Element.FIRE, DamageType.FIRE),
+        WATER_WALL("water_wall",Element.WATER, DamageType.WATER);
+
+        public final String spriteName;
+        public final Element element;
+        public final DamageType damageType;
+
+        WallType(String spriteName, Element element, DamageType damageType) {
+            this.spriteName = spriteName;
+            this.element = element;
+            this.damageType = damageType;
         }
+
+        public void p(){
+            for(WallType w : values()){}
+        }
+    }
+
+    public ElementalWall(Area area, Orientation orientation, DiscreteCoordinates position, WallType wallType, Logic key) {
+        super(area, orientation, position);
+        wallSprites = RPGSprite.extractSprites (wallType.spriteName, 4, 1, 1,  this,
+                Vector.ZERO , 256 , 256);
+        this.element = wallType.element;
+        this.damageType = wallType.damageType;
+        this.logicKey = key;
         handler = new ElementalWallInteractionHandler();
     }
 
@@ -61,25 +80,17 @@ public class ElementalWall extends AreaEntity implements ElementalEntity, Logic,
 
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
-        other.acceptInteraction(handler, isCellInteraction);
-        System.out.println("test");
-    }
-
-
-    @Override
-    public boolean isOn() {
-        return true;
-    }
-
-    @Override
-    public boolean isOff() {
-        return false;
+        if(logicKey.isOff()) {
+            other.acceptInteraction(handler, isCellInteraction);
+        }
     }
 
     @Override
     public void draw(Canvas canvas){
-        super.draw(canvas);
-        wallSprites[getOrientation().ordinal()].draw(canvas);
+        if(logicKey.isOff()) {
+            super.draw(canvas);
+            wallSprites[getOrientation().ordinal()].draw(canvas);
+        }
     }
 
     @Override
@@ -90,7 +101,11 @@ public class ElementalWall extends AreaEntity implements ElementalEntity, Logic,
 
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
-        return List.of();
+        return Collections.singletonList(getCurrentMainCellCoordinates());
+    }
+
+    public boolean isDisabled(){
+        return logicKey.isOn();
     }
 
     @Override
@@ -110,23 +125,13 @@ public class ElementalWall extends AreaEntity implements ElementalEntity, Logic,
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v, boolean isCellInteraction) {
-        System.out.println("test1");
         ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
     }
     private class ElementalWallInteractionHandler implements ICoopInteractionVisitor {
 
         @Override
         public void interactWith(ICoopPlayer player, boolean isCellInteraction) {
-            if (element == Element.FIRE) {
-                player.damage(DamageType.FIRE, DAMAGE_QUANTITY);
-            }
-            else if (element == Element.WATER) {
-                player.damage(DamageType.WATER, DAMAGE_QUANTITY);
-            }
-
+            player.damage(damageType, DAMAGE_QUANTITY);
         }
     }
-
-
-
 }

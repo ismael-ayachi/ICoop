@@ -19,29 +19,43 @@ public class Orb extends ElementalItem {
 
     private final static int ANIMATION_DURATION = 24;
     private final static int ANIMATION_FRAMES = 6;
-    private static int spriteYDelta;
+    private final int spriteYDelta;
     final Sprite[] sprites = new Sprite [ ANIMATION_FRAMES ];
     private final Animation orbAnimation;
 
-    private Dialog orbDialog;
-
     private final Element element;
+    private final DamageType damageType;
+
+    private final Dialog orbDialog;
     private final DialogHandler dialogHandler;
 
+    public enum OrbType {
+        FIRE_ORB(64, Element.FIRE, DamageType.FIRE, new Dialog("orb_fire_msg")),
+        WATER_ORB(0,Element.WATER, DamageType.WATER, new Dialog("orb_water_msg"));
 
-    public Orb(Area area, DiscreteCoordinates position, Element element, DialogHandler handler) {
-        super(area, Orientation.UP, position, element);
-        this.element = element;
-        dialogHandler = handler;
+        public final int spriteYDelta;
+        public final Element element;
+        public final DamageType damageType;
+        public final Dialog orbDialog;
 
-        if(element.equals(Element.FIRE)){
-            spriteYDelta = 64;
-            orbDialog = new Dialog("orb_fire_msg");
+
+        OrbType(int spriteYDelta, Element element, DamageType damageType, Dialog orbDialog) {
+            this.spriteYDelta = spriteYDelta;
+            this.element = element;
+            this.orbDialog = orbDialog;
+            this.damageType = damageType;
         }
-        else if (element.equals(Element.WATER)){
-            spriteYDelta = 0;
-            orbDialog = new Dialog("orb_water_msg");
-        }
+    }
+
+    public Orb(Area area, DiscreteCoordinates position, OrbType orbType, DialogHandler handler) {
+        super(area, Orientation.UP, position, orbType.element);
+        this.element = orbType.element;
+        this.damageType = orbType.damageType;
+        this.spriteYDelta = orbType.spriteYDelta;
+        this.orbDialog = orbType.orbDialog;
+
+        this.dialogHandler = handler;
+
 
         for ( int i = 0; i < ANIMATION_FRAMES ; i ++) {
             sprites [i] = new RPGSprite("icoop/orb", 1, 1, this ,
@@ -50,11 +64,14 @@ public class Orb extends ElementalItem {
         orbAnimation = new Animation ( ANIMATION_DURATION / ANIMATION_FRAMES , sprites );
     }
 
+    public DamageType getDamageType() {
+        return damageType;
+    }
+
     @Override
     public void collect() {
-        super.collect();
         dialogHandler.publish(orbDialog);
-        getOwnerArea().unregisterActor(this);
+        super.collect();
     }
 
     @Override

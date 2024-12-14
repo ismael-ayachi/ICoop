@@ -1,27 +1,23 @@
 package ch.epfl.cs107.icoop.actor;
 
-import ch.epfl.cs107.icoop.ICoop;
 import ch.epfl.cs107.icoop.KeyBindings;
-import ch.epfl.cs107.icoop.area.ICoopArea;
-import ch.epfl.cs107.icoop.area.ICoopBehavior;
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
+import ch.epfl.cs107.icoop.handler.ICoopInventory;
+import ch.epfl.cs107.icoop.handler.ICoopItem;
+import ch.epfl.cs107.icoop.handler.ICoopPlayerStatusGUI;
 import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.areagame.actor.Interactor;
 import ch.epfl.cs107.play.areagame.actor.MovableAreaEntity;
 import ch.epfl.cs107.play.areagame.area.Area;
 import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.engine.actor.OrientedAnimation;
-import ch.epfl.cs107.play.engine.actor.Sprite;
-import ch.epfl.cs107.play.engine.actor.TextGraphics;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.math.Transform;
 import ch.epfl.cs107.play.math.Vector;
-import ch.epfl.cs107.play.signal.Signal;
 import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Keyboard;
 
-import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,19 +31,23 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     private DamageType immunity;
 
     private final static int MAX_LIFE = 5;
-    private Health hp;
+    private final Health hp;
     private final static int IFRAMES = 24;
     private int timer;
 
     private final static int ANIMATION_DURATION = 4;
     private final static int MOVE_DURATION = 8;
+    private final ICoopPlayerStatusGUI statusGUI;
 
     private final Vector anchor = new Vector(0, 0);
     private final Orientation[] orders = {DOWN, RIGHT, UP, LEFT};
-    private OrientedAnimation animation;
+    private final OrientedAnimation animation;
     private KeyBindings.PlayerKeyBindings keys = KeyBindings.RED_PLAYER_KEY_BINDINGS;
 
-    private ICoopPlayerInteractionHandler handler;
+    private final ICoopPlayerInteractionHandler handler;
+
+    private final ICoopInventory inventory = new ICoopInventory("pocket");;
+    private ICoopItem currentItem;
 
     private Door currentDoor;
     private boolean doorIsPassed;
@@ -58,20 +58,39 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
      * @param coordinates (DiscreteCoordinates) the initial position in the grid
      *                    //* @param spriteName (String) name of the sprite used as graphical representation
      */
-    public ICoopPlayer(Area owner, Orientation orientation, DiscreteCoordinates coordinates, Element element, String prefix) {
-        super(owner, orientation, coordinates);
-        this.element = element;
-        if (prefix == "icoop/player") {
-            keys = KeyBindings.RED_PLAYER_KEY_BINDINGS;
-        } else if (prefix == "icoop/player2") {
-            keys = KeyBindings.BLUE_PLAYER_KEY_BINDINGS;
+
+    public enum PlayerType {
+        RED_PLAYER("icoop/player", Element.FIRE, KeyBindings.RED_PLAYER_KEY_BINDINGS, false),
+        BLUE_PLAYER("icoop/player2", Element.WATER, KeyBindings.BLUE_PLAYER_KEY_BINDINGS, true);
+
+        public final String prefix;
+        public final Element element;
+        public final KeyBindings.PlayerKeyBindings keys;
+        public final boolean posGUI;
+
+
+        PlayerType(String prefix, Element element, KeyBindings.PlayerKeyBindings keys, boolean posGUI){
+            this.prefix = prefix;
+            this.element = element;
+            this.keys = keys;
+            this.posGUI = posGUI;
         }
-        animation = new OrientedAnimation(prefix, ANIMATION_DURATION, this,
-                anchor, orders, 4, 1, 2, 16, 32,
-                true);
+    }
+
+    public ICoopPlayer(Area owner, Orientation orientation, DiscreteCoordinates coordinates, PlayerType playerType) {
+        super(owner, orientation, coordinates);
+        this.element = playerType.element;
+        this.keys = playerType.keys;
+        this.animation = new OrientedAnimation(playerType.prefix, ANIMATION_DURATION, this,
+                anchor, orders, 4, 1, 2, 16, 32, true);
+        this.statusGUI = new ICoopPlayerStatusGUI(this, playerType.posGUI);
         resetMotion();
-        handler = new ICoopPlayerInteractionHandler();
+
+
+        this.handler = new ICoopPlayerInteractionHandler();
         this.hp= new Health(this,Transform.I.translated(0,1.75f),MAX_LIFE,true);
+
+        inventory.addPocketItem(ICoopItem.SWORD, 1);
     }
 
     /**
@@ -92,6 +111,10 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         if (timer > 0) {
             timer--;
         }
+
+        if (keyboard.get(keys.useItem()).isPressed()){
+            nextItem();
+        }
     }
 
     /**
@@ -103,6 +126,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
             animation.draw(canvas);
         }
         hp.draw(canvas);
+        statusGUI.draw(canvas);
     }
 
     @Override
@@ -187,6 +211,8 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         }
     }
 
+    public void nextItem() { }
+
     /**
      * Leave an area by unregister this player
      */
@@ -242,7 +268,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
         @Override
         public void interactWith(Door door, boolean isCellInteraction) {
-            if (door.getSignal().isOn()) {
+            if (door.getSignal().isOn() && isCellInteraction) {
                 setCurrentDoor(door);
                 setDoorIsPassed(true);
             }
@@ -251,6 +277,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         @Override
         public void interactWith(Bomb bomb, boolean isCellInteraction) {
             if (isCellInteraction) {
+                System.out.println("bomb");
                 bomb.collect();
             } else {
                 bomb.activate();
@@ -259,26 +286,31 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
         @Override
         public void interactWith(Orb orb, boolean isCellInteraction) {
-            orb.collect();
-            if (orb.element()==Element.FIRE){
-                immunity = DamageType.FIRE;
-            }
-            else if (orb.element()==Element.WATER){
-                immunity = DamageType.WATER;
+            if (isCellInteraction) {
+                orb.collect();
+                immunity = orb.getDamageType();
             }
         }
 
         @Override
-        public void interactWith(ElementalWall wall, boolean isCellInteraction) {
-            System.out.println("aaaaa");
+        public void interactWith(Heart heart, boolean isCellInteraction) {
+            if (isCellInteraction) {
+                heart.collect();
+                hp.increase(1);
+            }
+        }
+
+        @Override
+        public void interactWith(PressurePlate plate, boolean isCellInteraction) {
+            if (isCellInteraction) {
+                plate.step(ICoopPlayer.this);
+            }
         }
 
         @Override
         public Element element() {
             return element;
         }
-
-
     }
 }
 

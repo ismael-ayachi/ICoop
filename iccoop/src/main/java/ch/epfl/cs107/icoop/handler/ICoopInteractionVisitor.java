@@ -23,8 +23,14 @@ public interface ICoopInteractionVisitor extends AreaInteractionVisitor {
 
     default void interactWith(Rock rock, boolean isCellInteraction) {}
 
+    default void interactWith(ElementalWall elementalWall, boolean isCellInteraction) {}
+
     default void interactWith(Orb orb, boolean isCellInteraction) {}
 
-    default ElementalEntity.Element element() {return null;}
+    default void interactWith(Heart heart, boolean isCellInteraction) {}
+
+    default void interactWith(PressurePlate plate, boolean isCellInteraction) {}
+
+    default ElementalEntity.Element element() {return ElementalEntity.Element.NO_ELEMENT;}
 }
 

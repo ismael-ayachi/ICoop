@@ -55,9 +55,8 @@ public class Bomb extends ICoopCollectable implements Interactor {
     }
 
     public void collect() {
-        super.collect();
         if (!(isExploding||exploded)) {
-            getOwnerArea().unregisterActor(this);
+            super.collect();
         }
     }
 

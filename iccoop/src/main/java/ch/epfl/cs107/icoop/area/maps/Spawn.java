@@ -37,7 +37,9 @@ public class Spawn extends ICoopArea {
                 new DiscreteCoordinates(1,5), new DiscreteCoordinates(19,15), new DiscreteCoordinates(19,16)));
         registerActor(new Rock(this, Orientation.DOWN, new DiscreteCoordinates(10,10)));
         registerActor(new Bomb(this, Orientation.DOWN, new DiscreteCoordinates(11,10)));
-    }
+
+        registerActor(new Door(this, "Maze", Logic.TRUE, new DiscreteCoordinates(2,39),
+                new DiscreteCoordinates(3,39), new DiscreteCoordinates(4,0), new DiscreteCoordinates(5,0)));    }
 
     @Override
     public String getTitle() {

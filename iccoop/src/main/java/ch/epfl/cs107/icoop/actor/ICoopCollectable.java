@@ -2,7 +2,6 @@ package ch.epfl.cs107.icoop.actor;
 
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
 import ch.epfl.cs107.play.areagame.actor.CollectableAreaEntity;
-import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.areagame.area.Area;
 import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
@@ -16,6 +15,11 @@ public abstract class ICoopCollectable extends CollectableAreaEntity {
         super(area, orientation, position);
     }
 
+    @Override
+    public void collect(){
+        super.collect();
+        getOwnerArea().unregisterActor(this);
+    }
 
     @Override
     public boolean isCellInteractable() {
@@ -35,7 +39,9 @@ public abstract class ICoopCollectable extends CollectableAreaEntity {
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v, boolean isCellInteraction){
-        ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
+        if(!isCollected()) {
+            ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
+        }
     }
 }
 

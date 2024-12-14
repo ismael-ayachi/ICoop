@@ -5,6 +5,7 @@ import ch.epfl.cs107.icoop.actor.CenterOfMass;
 import ch.epfl.cs107.icoop.actor.ElementalEntity;
 import ch.epfl.cs107.icoop.actor.ICoopPlayer;
 import ch.epfl.cs107.icoop.area.ICoopArea;
+import ch.epfl.cs107.icoop.area.maps.Maze;
 import ch.epfl.cs107.icoop.area.maps.OrbWay;
 import ch.epfl.cs107.icoop.area.maps.Spawn;
 import ch.epfl.cs107.icoop.handler.DialogHandler;
@@ -18,8 +19,7 @@ import ch.epfl.cs107.play.engine.actor.Dialog;
 
 public final class ICoop extends AreaGame implements DialogHandler {
 
-    private final String[] areas = {"Spawn", "OrbWay"};
-    private int areaIndex;
+    private final String[] areas = {"Spawn", "OrbWay", "Maze"};
 
     private ICoopPlayer player1;
     private ICoopPlayer player2;
@@ -33,6 +33,7 @@ public final class ICoop extends AreaGame implements DialogHandler {
     private void createAreas() {
         addArea(new Spawn(this));
         addArea(new OrbWay(this));
+        addArea(new Maze());
     }
 
     /**
@@ -44,8 +45,7 @@ public final class ICoop extends AreaGame implements DialogHandler {
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {
             createAreas();
-            areaIndex = 0;
-            initArea(areas[areaIndex]);
+            initArea(areas[0]);
             return true;
         }
         return false;
@@ -88,6 +88,8 @@ public final class ICoop extends AreaGame implements DialogHandler {
             }
             player2.setDoorIsPassed(false);
 
+
+
         } else {
             getCurrentArea().draw(getWindow());
             activeDialog.draw(getWindow());
@@ -121,9 +123,9 @@ public final class ICoop extends AreaGame implements DialogHandler {
      */
     private void initArea(String areaKey) {
         ICoopArea area = (ICoopArea) setCurrentArea(areaKey, true);
-        DiscreteCoordinates coords[] = area.getPlayerSpawnPosition();
-        player1 = new ICoopPlayer(area, Orientation.DOWN, coords[0], ElementalEntity.Element.FIRE, "icoop/player");
-        player2 = new ICoopPlayer(area, Orientation.DOWN, coords[1], ElementalEntity.Element.WATER, "icoop/player2");
+        DiscreteCoordinates[] coords = area.getPlayerSpawnPosition();
+        player1 = new ICoopPlayer(area, Orientation.DOWN, coords[0], ICoopPlayer.PlayerType.RED_PLAYER);
+        player2 = new ICoopPlayer(area, Orientation.DOWN, coords[1], ICoopPlayer.PlayerType.BLUE_PLAYER);
         player1.enterArea(area, coords[0]);
         player2.enterArea(area, coords[1]);
     }
@@ -141,7 +143,7 @@ public final class ICoop extends AreaGame implements DialogHandler {
     }
 
     private void resetArea() {
-        DiscreteCoordinates coords[] = ((ICoopArea) getCurrentArea()).getPlayerSpawnPosition();
+        DiscreteCoordinates[] coords = ((ICoopArea) getCurrentArea()).getPlayerSpawnPosition();
         switchArea(getCurrentArea().getTitle(), coords, true);
         if (player1.isDead() || player2.isDead()) {
             player1.resetHealth();
