@@ -80,14 +80,14 @@ public class ElementalWall extends AreaEntity implements ElementalEntity, Intera
 
     @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
-        if(logicKey.isOff()) {
+        if(logicKey.isOn()) {
             other.acceptInteraction(handler, isCellInteraction);
         }
     }
 
     @Override
     public void draw(Canvas canvas){
-        if(logicKey.isOff()) {
+        if(logicKey.isOn()) {
             super.draw(canvas);
             wallSprites[getOrientation().ordinal()].draw(canvas);
         }
@@ -105,8 +105,10 @@ public class ElementalWall extends AreaEntity implements ElementalEntity, Intera
     }
 
     public boolean isDisabled(){
-        return logicKey.isOn();
+        return logicKey.isOff();
     }
+
+    public void destroy() {getOwnerArea().unregisterActor(this);}
 
     @Override
     public boolean takeCellSpace() {
@@ -120,7 +122,7 @@ public class ElementalWall extends AreaEntity implements ElementalEntity, Intera
 
     @Override
     public boolean isViewInteractable() {
-        return false;
+        return true;
     }
 
     @Override

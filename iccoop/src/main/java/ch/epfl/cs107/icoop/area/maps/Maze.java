@@ -47,17 +47,17 @@ public class Maze extends ICoopArea {
 
         registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(8,21), FIRE_WALL, pressurePlate2));
 
-        registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(4,35), WATER_WALL, Logic.FALSE));
-        registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(4,36), WATER_WALL,Logic.FALSE));
+        registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(4,35), WATER_WALL, Logic.TRUE));
+        registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(4,36), WATER_WALL,Logic.TRUE));
 
-        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(2,34), FIRE_WALL, Logic.FALSE));
-        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(3,34), FIRE_WALL, Logic.FALSE));
+        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(2,34), FIRE_WALL, Logic.TRUE));
+        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(3,34), FIRE_WALL, Logic.TRUE));
 
-        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(5,24), WATER_WALL, Logic.FALSE));
-        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(6,24), WATER_WALL, Logic.FALSE));
+        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(5,24), WATER_WALL, Logic.TRUE));
+        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(6,24), WATER_WALL, Logic.TRUE));
 
-        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(8,4), WATER_WALL, Logic.FALSE));
-        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(13,4), FIRE_WALL, Logic.FALSE));
+        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(8,4), WATER_WALL, Logic.TRUE));
+        registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(13,4), FIRE_WALL, Logic.TRUE));
 
 
     }

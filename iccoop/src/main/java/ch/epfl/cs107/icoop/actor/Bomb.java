@@ -1,6 +1,7 @@
 package ch.epfl.cs107.icoop.actor;
 
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
+import ch.epfl.cs107.icoop.handler.Timer;
 import ch.epfl.cs107.play.areagame.actor.AreaEntity;
 import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.areagame.actor.Interactor;
@@ -28,30 +29,31 @@ public class Bomb extends ICoopCollectable implements Interactor {
     private static final DamageType DAMAGE_TYPE = DamageType.PHYSICAL;
     private static final int DAMAGE_QUANTITY = 2;
 
+    public static final int DEFAULT_BOMB_TIMER = 72;
+
     private boolean isExploding = false;
     private boolean exploded = false;
 
-    private int bombTimer = 3*24 ;
+    private Timer bombTimer;
 
-    private BombInteractionHandler handler;
+    private final BombInteractionHandler handler;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area, orientation, position);
         handler = new BombInteractionHandler();
+        bombTimer = new Timer();
     }
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position, int bombTimer) {
         super(area, orientation, position);
-        this.bombTimer=bombTimer;
+        this.bombTimer = new Timer(bombTimer);
         handler = new BombInteractionHandler();
+        activate();
     }
 
     public void activate() {
         isExploding = true;
-    }
-
-    public void tickBombTimer() {
-        this.bombTimer--;
+        bombTimer.setTime(ANIMATION_DURATION*3);
     }
 
     public void collect() {
@@ -61,40 +63,36 @@ public class Bomb extends ICoopCollectable implements Interactor {
     }
 
     public void explode() {
-        if (isExploding && bombTimer==0) {
-            exploded = true;
-            isExploding = false;
-        }
+        exploded = true;
+        isExploding = false;
+        bombTimer.reset();
     }
 
     @Override
-    public void update(float deltatime) {
-        super.update(deltatime);
+    public void update(float deltaTime) {
+        super.update(deltaTime);
 
         if (exploded) {
-            explosionOn.update(deltatime);
+            explosionOn.update(deltaTime);
             if (explosionOn.isCompleted()) {
                 getOwnerArea().unregisterActor(this);
             }
         }
-
         else if (isExploding) {
-            explosionOff.update(deltatime);
-            tickBombTimer();
+            explosionOff.update(deltaTime);
+            bombTimer.tick();
+            if (bombTimer.isOff()) explode();
         }
-        explode();
-
     }
 
     @Override
     public void draw (Canvas canvas) {
         super.draw(canvas);
 
-        if (exploded && bombTimer==0 && !explosionOn.isCompleted()) {
+        if (exploded  && !explosionOn.isCompleted()) {
             explosionOn.draw(canvas);
         }
-
-        else if(!exploded && bombTimer!=0 && !explosionOff.isCompleted())  {
+        else if(!exploded && !explosionOff.isCompleted())  {
             explosionOff.draw(canvas);
         }
     }
@@ -137,23 +135,31 @@ public class Bomb extends ICoopCollectable implements Interactor {
 
     @Override
     public List<DiscreteCoordinates> getFieldOfViewCells() {
-        List<DiscreteCoordinates> fieldOfViewCells = new ArrayList<>();
-        for(Orientation orientation : Orientation.values()) {
-            fieldOfViewCells.add(getCurrentMainCellCoordinates().jump(orientation.toVector()));
-        }
-        return fieldOfViewCells;
+        return getCurrentMainCellCoordinates().getNeighbours();
     }
 
     private class BombInteractionHandler implements ICoopInteractionVisitor {
 
         @Override
-        public void interactWith(Rock rock, boolean isViewInteraction) {
+        public void interactWith(Rock rock, boolean isCellInteraction) {
             rock.destroy();
         }
 
         @Override
-        public void interactWith(ICoopPlayer player, boolean isViewInteraction) {
+        public void interactWith(ICoopPlayer player, boolean isCellInteraction) {
             player.damage(DAMAGE_TYPE,DAMAGE_QUANTITY);
+        }
+
+        @Override
+        public void interactWith(ElementalWall wall, boolean isCellInteraction) {
+            wall.destroy();
+        }
+
+        @Override
+        public void interactWith(Bomb bomb, boolean isCellInteraction){
+            if(!isCellInteraction){
+                bomb.explode();
+            }
         }
     }
 }

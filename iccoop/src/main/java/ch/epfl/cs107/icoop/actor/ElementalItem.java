@@ -1,9 +1,7 @@
 package ch.epfl.cs107.icoop.actor;
 
 
-import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
 import ch.epfl.cs107.play.areagame.area.Area;
-import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.signal.logic.Logic;
@@ -18,8 +16,8 @@ public abstract class ElementalItem extends ICoopCollectable implements Elementa
         this.element = element;
     }
 
-    public boolean isSameElement(AreaInteractionVisitor v) {
-        return ((ICoopInteractionVisitor) v).element() == element;
+    public boolean isSameElement(ElementalEntity v) {
+        return v.element() == element;
     }
 
     @Override

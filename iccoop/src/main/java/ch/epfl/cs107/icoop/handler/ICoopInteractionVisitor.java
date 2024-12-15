@@ -31,6 +31,11 @@ public interface ICoopInteractionVisitor extends AreaInteractionVisitor {
 
     default void interactWith(PressurePlate plate, boolean isCellInteraction) {}
 
-    default ElementalEntity.Element element() {return ElementalEntity.Element.NO_ELEMENT;}
+    default void interactWith(Foe foe, boolean isCellInteraction) {}
+
+    default void interactWith(HellSkull hellSkull, boolean isCellInteraction) {}
+
+    default void interactWith(BombFoe bombfoe, boolean isCellInteraction) {}
+
 }
 

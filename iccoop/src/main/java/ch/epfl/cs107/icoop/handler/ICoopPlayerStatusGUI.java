@@ -1,6 +1,8 @@
 package ch.epfl.cs107.icoop.handler;
 
 import ch.epfl.cs107.icoop.actor.ICoopPlayer;
+import ch.epfl.cs107.play.areagame.handler.Inventory;
+import ch.epfl.cs107.play.areagame.handler.InventoryItem;
 import ch.epfl.cs107.play.engine.actor.Graphics;
 import ch.epfl.cs107.play.engine.actor.ImageGraphics;
 import ch.epfl.cs107.play.io.ResourcePath;
@@ -8,18 +10,23 @@ import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
+import java.util.NavigableMap;
+
 /**
  * A GUI that shows information about the player on the screen.
  */
 public class ICoopPlayerStatusGUI implements Graphics {
 
     private final static int DEPTH = 2000;
-    private final ICoopPlayer player;
+    private ICoopItem currentItem;
     private final boolean flipped;
 
-    public ICoopPlayerStatusGUI(ICoopPlayer player, boolean flipped) {
-        this.player = player;
+    public ICoopPlayerStatusGUI(boolean flipped) {
         this.flipped = flipped;
+    }
+
+    public void setCurrentItem(ICoopItem item) {
+        currentItem = item;
     }
 
     @Override
@@ -39,5 +46,12 @@ public class ICoopPlayerStatusGUI implements Graphics {
         //Draw selected gear
         ImageGraphics gearDisplay = new ImageGraphics(ResourcePath.getSprite("icoop/gearDisplay"), 1.5f, 1.5f, new RegionOfInterest(0, 0, 32, 32), anchor.add(new Vector(0, height - 1.75f)), 1, DEPTH);
         gearDisplay.draw(canvas);
+
+        if(currentItem!=null){
+            ImageGraphics currentItemDisplay = new ImageGraphics ( ResourcePath.getSprite (currentItem.getName()) ,0.5f,
+                    0.5f , new RegionOfInterest (0 , 0, 16 , 16) , anchor.add (new Vector(0.5f , height - 1.25f)) , 1, DEPTH );
+            currentItemDisplay.draw(canvas);
+        }
     }
+
 }

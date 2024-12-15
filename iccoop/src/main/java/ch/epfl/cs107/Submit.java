@@ -56,6 +56,7 @@ public final class Submit {
             });
 
             var zipArchive = createZipArchive(ICCOOP_PROJECT.resolve("src"), paths);
+            TARGET_FOLDER.toFile().mkdirs();
             Files.write(SUBMISSION_FILE, zipArchive);
         } catch (IOException e) {
             System.err.println("Erreur inattendue !");

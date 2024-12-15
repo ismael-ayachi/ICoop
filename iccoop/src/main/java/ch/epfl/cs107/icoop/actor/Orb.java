@@ -94,8 +94,10 @@ public class Orb extends ElementalItem {
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v, boolean isCellInteraction) {
-        if (super.isSameElement(v)) {
-            ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
+        if (v instanceof ElementalEntity){
+            if(isSameElement((ElementalEntity) v)) {
+                ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
+            }
         }
     }
 

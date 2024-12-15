@@ -1,15 +1,14 @@
 package ch.epfl.cs107.icoop.actor;
 
 import ch.epfl.cs107.icoop.KeyBindings;
-import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
-import ch.epfl.cs107.icoop.handler.ICoopInventory;
-import ch.epfl.cs107.icoop.handler.ICoopItem;
-import ch.epfl.cs107.icoop.handler.ICoopPlayerStatusGUI;
+import ch.epfl.cs107.icoop.handler.*;
 import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.areagame.actor.Interactor;
 import ch.epfl.cs107.play.areagame.actor.MovableAreaEntity;
 import ch.epfl.cs107.play.areagame.area.Area;
 import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.areagame.handler.Inventory;
+import ch.epfl.cs107.play.areagame.handler.InventoryItem;
 import ch.epfl.cs107.play.engine.actor.OrientedAnimation;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
@@ -26,14 +25,14 @@ import static ch.epfl.cs107.play.math.Orientation.*;
 /**
  * A ICoopPlayer is a player for the ICoop game.
  */
-public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor {
+public final class ICoopPlayer extends MovableAreaEntity implements ElementalEntity, Interactor, Inventory.Holder, TargetEntity {
     private final Element element;
     private DamageType immunity;
 
     private final static int MAX_LIFE = 5;
     private final Health hp;
     private final static int IFRAMES = 24;
-    private int timer;
+    private final Timer invincibilityTimer;
 
     private final static int ANIMATION_DURATION = 4;
     private final static int MOVE_DURATION = 8;
@@ -46,8 +45,9 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
 
     private final ICoopPlayerInteractionHandler handler;
 
-    private final ICoopInventory inventory = new ICoopInventory("pocket");;
+    private final ICoopInventory inventory;
     private ICoopItem currentItem;
+    private int currentItemIndex;
 
     private Door currentDoor;
     private boolean doorIsPassed;
@@ -83,14 +83,20 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         this.keys = playerType.keys;
         this.animation = new OrientedAnimation(playerType.prefix, ANIMATION_DURATION, this,
                 anchor, orders, 4, 1, 2, 16, 32, true);
-        this.statusGUI = new ICoopPlayerStatusGUI(this, playerType.posGUI);
-        resetMotion();
+        this.hp = new Health(this,Transform.I.translated(0,1.75f),MAX_LIFE,true);
 
+        this.invincibilityTimer = new Timer();
 
         this.handler = new ICoopPlayerInteractionHandler();
-        this.hp= new Health(this,Transform.I.translated(0,1.75f),MAX_LIFE,true);
+
+        this.inventory= new ICoopInventory("playerPocket");
+        this.statusGUI = new ICoopPlayerStatusGUI(playerType.posGUI);
 
         inventory.addPocketItem(ICoopItem.SWORD, 1);
+        currentItem = ICoopItem.SWORD;
+        inventory.addPocketItem(ICoopItem.BOMB, 1);
+
+        resetMotion();
     }
 
     /**
@@ -108,13 +114,14 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         moveIfPressed(RIGHT, keyboard.get(keys.right()));
         moveIfPressed(DOWN, keyboard.get(keys.down()));
 
-        if (timer > 0) {
-            timer--;
-        }
+        invincibilityTimer.tick();
 
-        if (keyboard.get(keys.useItem()).isPressed()){
-            nextItem();
+        if (keyboard.get(keys.switchItem()).isPressed()){
+            switchItem();
+        } else if (keyboard.get(keys.useItem()).isPressed()){
+            useCurrentItem();
         }
+        statusGUI.setCurrentItem(currentItem);
     }
 
     /**
@@ -122,7 +129,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
      */
     @Override
     public void draw(ch.epfl.cs107.play.window.Canvas canvas) {
-        if (timer%3==0) {
+        if (invincibilityTimer.interval(3)) {
             animation.draw(canvas);
         }
         hp.draw(canvas);
@@ -147,6 +154,11 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
         return Collections.singletonList(getCurrentMainCellCoordinates());
+    }
+
+    @Override
+    public DiscreteCoordinates getCurrentMainCellCoordinates() {
+        return super.getCurrentMainCellCoordinates();
     }
 
     @Override
@@ -211,8 +223,6 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         }
     }
 
-    public void nextItem() { }
-
     /**
      * Leave an area by unregister this player
      */
@@ -248,12 +258,12 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     }
 
     public boolean invincible() {
-        return !(timer == 0);
+        return invincibilityTimer.isGoing();
     }
 
     public void damage(DamageType damageType, int damage) {
         if (damageType!=immunity && !invincible() && hp.isOn()) {
-            timer = IFRAMES;
+            invincibilityTimer.setTime(IFRAMES);
             hp.decrease(damage);
         }
     }
@@ -263,8 +273,47 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
     }
 
 
+    @Override
+    public boolean possess(InventoryItem item){
+        return inventory.contains(item);
+    }
 
-    private class ICoopPlayerInteractionHandler implements ICoopInteractionVisitor {
+    public void switchItem() {
+        for (int i=0; i<ICoopItem.values().length; i++) {
+            currentItemIndex++;
+            currentItemIndex %= ICoopItem.values().length;
+            if (possess(ICoopItem.values()[currentItemIndex])) break;
+        }
+        currentItem = ICoopItem.values()[currentItemIndex];
+    }
+
+    public void useCurrentItem(){
+        if (currentItem!=null) {
+            if (possess(currentItem)) {
+                switch (currentItem) {
+                    case BOMB: {
+                        if (placeBomb()) inventory.removePocketItem(currentItem, 1);
+                    }
+                    default : break;
+                }
+            }
+            if (!possess(currentItem)) currentItem = null;
+        }
+    }
+
+    public boolean placeBomb() {
+        Bomb placedBomb = new Bomb(getOwnerArea(), DOWN, getFieldOfViewCells().getFirst(), Bomb.DEFAULT_BOMB_TIMER);
+        if (getOwnerArea().canEnterAreaCells(placedBomb, getFieldOfViewCells())) {
+            return getOwnerArea().registerActor(placedBomb);
+        }
+        return false;
+    }
+
+    public ICoopItem getCurrentItem() {
+        return currentItem;
+    }
+
+    private class ICoopPlayerInteractionHandler implements ICoopInteractionVisitor, ElementalEntity {
 
         @Override
         public void interactWith(Door door, boolean isCellInteraction) {
@@ -277,7 +326,7 @@ public final class ICoopPlayer extends MovableAreaEntity implements ElementalEnt
         @Override
         public void interactWith(Bomb bomb, boolean isCellInteraction) {
             if (isCellInteraction) {
-                System.out.println("bomb");
+                inventory.addPocketItem(ICoopItem.BOMB,1);
                 bomb.collect();
             } else {
                 bomb.activate();

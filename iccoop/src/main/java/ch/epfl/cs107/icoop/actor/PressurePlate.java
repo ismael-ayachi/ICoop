@@ -55,17 +55,17 @@ public class PressurePlate extends AreaEntity implements Logic {
     @Override
     public boolean isOn() {
         if(currentPlayer!=null) {
-            return currentPlayer.getCurrentMainCellCoordinates().equals(getCurrentMainCellCoordinates());
+            return !currentPlayer.getCurrentMainCellCoordinates().equals(getCurrentMainCellCoordinates());
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean isOff() {
         if (currentPlayer != null) {
-            return !currentPlayer.getCurrentMainCellCoordinates().equals(getCurrentMainCellCoordinates());
+            return currentPlayer.getCurrentMainCellCoordinates().equals(getCurrentMainCellCoordinates());
         }
-        return true;
+        return false;
     }
 
     public void step(ICoopPlayer player) {
