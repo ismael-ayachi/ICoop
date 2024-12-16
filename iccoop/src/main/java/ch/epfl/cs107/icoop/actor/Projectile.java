@@ -32,7 +32,7 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
     public void update(float deltaTime) {
         super.update(deltaTime);
         if (!isDisplacementOccurs()) {
-            move(MOVE_DURATION);
+            move(MOVE_DURATION/speed);
             travel();
         }
     }
@@ -63,7 +63,7 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
 
     @Override
     public boolean wantsCellInteraction(){
-        return distance!=MAX_DISTANCE;
+        return distance != MAX_DISTANCE;
     }
 
     @Override

@@ -15,8 +15,8 @@ public class Flame extends Projectile implements Unstoppable {
             this , 16 , 16 , 4, true );
     private final FlameInteractionHandler handler;
 
-    public Flame(Area area, Orientation orientation, DiscreteCoordinates position, int speed, int distance) {
-        super(area, orientation, position, speed, distance);
+    public Flame(Area area, Orientation orientation, DiscreteCoordinates position) {
+        super(area, orientation, position, 2, 8);
         handler = new FlameInteractionHandler();
 
 
@@ -31,7 +31,6 @@ public class Flame extends Projectile implements Unstoppable {
 
     @Override
     public void draw(Canvas canvas) {
-
         animation.draw(canvas);
     }
 

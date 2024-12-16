@@ -1,6 +1,7 @@
 package ch.epfl.cs107.icoop.actor;
 
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
+import ch.epfl.cs107.icoop.handler.Timer;
 import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.areagame.actor.Interactor;
 import ch.epfl.cs107.play.areagame.actor.MovableAreaEntity;
@@ -18,10 +19,12 @@ import java.util.List;
 
 public abstract class Foe extends MovableAreaEntity implements Interactor {
 
+    private static final int IFRAMES = 8;
     private final int MAX_LIFE;
     private final Health hp;
 
     private final DamageType[] weaknesses;
+    private final Timer invincibilityTimer;
 
     private final static int ANIMATION_DURATION = 24;
     private final Animation deathAnimation = new Animation ("icoop/vanish", 7, 2, 2, this , 32 , 32 , new Vector ( -0.5f , 0f) , ANIMATION_DURATION /7 , false );
@@ -31,6 +34,7 @@ public abstract class Foe extends MovableAreaEntity implements Interactor {
         this.MAX_LIFE = maxLife;
         this.hp = new Health(this, Transform.I.translated(0,1.75f),MAX_LIFE,false);
         this.weaknesses = weaknesses;
+        this.invincibilityTimer = new Timer();
     }
 
     @Override
@@ -41,6 +45,7 @@ public abstract class Foe extends MovableAreaEntity implements Interactor {
             if (deathAnimation.isCompleted())
                 getOwnerArea().unregisterActor(this);
         }
+        invincibilityTimer.tick();
     }
 
     @Override
@@ -57,8 +62,10 @@ public abstract class Foe extends MovableAreaEntity implements Interactor {
 
     public void damage(DamageType damageType, int quantity){
         for(DamageType weakness : weaknesses){
-            if (weakness.equals(damageType))
+            if (weakness.equals(damageType) && invincibilityTimer.isOff()) {
                 hp.decrease(quantity);
+                invincibilityTimer.setTime(IFRAMES);
+            }
         }
     }
 

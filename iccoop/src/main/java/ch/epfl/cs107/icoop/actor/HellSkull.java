@@ -66,7 +66,7 @@ public class HellSkull extends Foe implements Interactable {
     }
 
     public void spawnFlame() {
-        Flame flame = new Flame(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates()/*.jump(getOrientation().toVector())*/, 10, 10 );
+        Flame flame = new Flame(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()));
         getOwnerArea().registerActor(flame);
     }
 

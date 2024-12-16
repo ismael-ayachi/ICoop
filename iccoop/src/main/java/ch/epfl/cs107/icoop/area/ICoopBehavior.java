@@ -95,8 +95,11 @@ public class ICoopBehavior extends AreaBehavior {
                 if (i.takeCellSpace() && entity.takeCellSpace()) {
                     return false;
                 }
-                else if (i instanceof ElementalWall && entity instanceof ICoopPlayer) {
-                    return ((ElementalWall) i).element().equals(((ICoopPlayer) entity).element()) || ((ElementalWall) i).isDisabled();
+                else if (i instanceof ElementalWall) {
+                    if (entity instanceof ElementalEntity){
+                        return ((ElementalWall) i).element().equals(((ElementalEntity)entity).element()) || ((ElementalWall) i).isDisabled();
+                    }
+                    return ((ElementalWall) i).isDisabled();
                 }
                 else if (entity instanceof Bomb && i instanceof Bomb){
                     return false;

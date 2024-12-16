@@ -26,7 +26,7 @@ public class BombFoe extends Foe implements TargetFollower {
 
     private final Vector anchor = new Vector(-0.5f, 0);
     private final Orientation[] orders = {DOWN , RIGHT , UP, LEFT};
-    private final int ANIMATION_DURATION = 24;
+    private final int ANIMATION_DURATION = 12;
     private final OrientedAnimation unprotectedAnimation = new OrientedAnimation("icoop/bombFoe", ANIMATION_DURATION/3,
             this , anchor , orders , 4, 2, 2, 32, 32,
             true);
@@ -37,14 +37,14 @@ public class BombFoe extends Foe implements TargetFollower {
     private final BombFoeInteractionHandler handler;
     private TargetEntity target;
 
-    private BombFoeState state;
+    private BombFoeState currentState;
     private final Timer inactivityTimer;
     private final Timer protectionTimer;
 
     public enum BombFoeState {
 
         IDLE(2, 8, true, true),
-        ATTACKING( 6, 2, true, true),
+        ATTACKING( 3, 1, true, true),
         GUARDING( 1, 1, false, false);
 
         public final int speedFactor;
@@ -52,18 +52,17 @@ public class BombFoe extends Foe implements TargetFollower {
         public final boolean damageable;
         public final int viewDistance;
 
-        BombFoeState(int speedFactor, int viewDistance, boolean wantsInteraction, boolean willWalk) {
+        BombFoeState(int speedFactor, int viewDistance, boolean wantsInteraction, boolean damageable) {
             this.speedFactor = speedFactor;
             this.viewDistance = viewDistance;
             this.aggressive = wantsInteraction;
-            this.damageable = willWalk;
+            this.damageable = damageable;
         }
-
     }
 
     public BombFoe(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area, orientation, position, 2, DamageType.FIRE, DamageType.PHYSICAL);
-        this.state = BombFoeState.IDLE;
+        this.currentState = BombFoeState.IDLE;
         this.handler = new BombFoeInteractionHandler();
         this.inactivityTimer = new Timer();
         this.protectionTimer = new Timer();
@@ -73,34 +72,43 @@ public class BombFoe extends Foe implements TargetFollower {
     public void update(float deltaTime) {
         super.update(deltaTime);
         if (inactivityTimer.isOff()) {
-            switch (state) {
+            switch (currentState) {
                 case IDLE: {
                     randomDisplacement();
-                    unprotectedAnimation.update(deltaTime);
-                    startInactivity();
+                    break;
                 }
                 case ATTACKING: {
-                    if (target!=null &&targetDisplacement(target)) {
-                        unprotectedAnimation.update(deltaTime);
-                        move(MOVE_DURATION / state.speedFactor);
-                        if (DiscreteCoordinates.distanceBetween(this.getCurrentMainCellCoordinates(), target.getCurrentMainCellCoordinates()) < 3) {
+                    if (target!=null && !isDisplacementOccurs()) {
+                        targetDisplacement(target);
+                        move(MOVE_DURATION / currentState.speedFactor);
+                        if (DiscreteCoordinates.distanceBetween(this.getCurrentMainCellCoordinates(), target.getCurrentMainCellCoordinates()) < 2) {
                             placeBomb();
-
                         }
                     }
+                    break;
                 }
                 case GUARDING: {
-                    protectedAnimation.update(deltaTime);
-                    guard();
+                    protectionTimer.tick();
+                    if(protectionTimer.isOff()){
+                        currentState = BombFoeState.IDLE;
+                        startInactivity();
+                    }
+                    break;
                 }
             }
         } else inactivityTimer.tick();
+
+        if (isDisplacementOccurs()) {
+            unprotectedAnimation.update(deltaTime);
+        } else if (currentState == BombFoeState.GUARDING){
+            protectedAnimation.update(deltaTime);
+        }
     }
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        if (state == BombFoeState.GUARDING) {
+        if (currentState == BombFoeState.GUARDING) {
             protectedAnimation.draw(canvas);
         } else {
             unprotectedAnimation.draw(canvas);
@@ -108,61 +116,35 @@ public class BombFoe extends Foe implements TargetFollower {
     }
 
     public void startInactivity() {
-        if (inactivityTimer.isOff()){
-            double randDouble = RandomGenerator.getInstance().nextDouble();
-            if (randDouble < 0.3) {
-                inactivityTimer.setTime(RandomGenerator.getInstance().nextInt(MAX_INACTIVITY));
-            }
-        }
+        inactivityTimer.setTime(RandomGenerator.getInstance().nextInt(MAX_INACTIVITY));
     }
 
     public void randomDisplacement() {
         if (!isDisplacementOccurs()) {
-            int randomInt = RandomGenerator.getInstance().nextInt(Orientation.values().length);
-            double randDouble = RandomGenerator.getInstance().nextDouble();
-            if (randDouble < 0.4) {
-                orientate(fromInt(randomInt));
+            int randomOrientationIndex = RandomGenerator.getInstance().nextInt(Orientation.values().length);
+            double randomizeOrientation = RandomGenerator.getInstance().nextDouble();
+            if (randomizeOrientation < 0.4) {
+                orientate(fromInt(randomOrientationIndex));
             }
-            move(MOVE_DURATION / state.speedFactor);
+            move(MOVE_DURATION / currentState.speedFactor);
+            double randomizeInactivity = RandomGenerator.getInstance().nextDouble();
+            if (randomizeInactivity < 0.2) {
+                startInactivity();
+            }
         }
     }
-/*
-    public void targetDisplacement(ICoopPlayer player) {
-        //float distance = DiscreteCoordinates.distanceBetween(this.getCurrentMainCellCoordinates(), player.getCurrentMainCellCoordinates());
-        float BombFoeX = this.getCurrentMainCellCoordinates().toVector().getX();
-        float BombFoeY = this.getCurrentMainCellCoordinates().toVector().getY();
-        float TargetX = player.getCurrentMainCellCoordinates().toVector().getX();
-        float TargetY = player.getCurrentMainCellCoordinates().toVector().getY();
-        Vector BombFoeVector = new Vector(BombFoeX, BombFoeY);
-        Vector TargetVector = new Vector(TargetX, TargetY);
-        Vector v = TargetVector.sub(BombFoeVector);
-        float deltaX = v.getX();
-        float deltaY = v.getY();
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            orientate(fromVector(new Vector(deltaX,0)));
-        }
-        else if (Math.abs(deltaY) > Math.abs(deltaX)) {
-            orientate(fromVector(new Vector(0, deltaY)));
-        }
-        else {
-            move(MOVE_DURATION/state.speedFactor);
-        }
-    }
-
- */
 
     public void placeBomb() {
         Bomb bomb = new Bomb(getOwnerArea(), DOWN, getFieldOfViewCells().getFirst(), Bomb.DEFAULT_BOMB_TIMER);
         if (getOwnerArea().canEnterAreaCells(bomb, getFieldOfViewCells())) {
             getOwnerArea().registerActor(bomb);
-            state = BombFoeState.GUARDING;
+            currentState = BombFoeState.GUARDING;
+            guard();
         }
     }
 
     public void guard() {
-        if(protectionTimer.isOff()){
-            protectionTimer.setTime(RandomGenerator.getInstance().nextInt(48,96));
-        } else state = BombFoeState.IDLE;
+        protectionTimer.setTime(RandomGenerator.getInstance().nextInt(48,120));
     }
 
 
@@ -178,7 +160,7 @@ public class BombFoe extends Foe implements TargetFollower {
     @Override
     public List<DiscreteCoordinates> getFieldOfViewCells() {
         List <DiscreteCoordinates> fieldOfViewCells = new ArrayList<>();
-        for (int i = 1; i <= state.viewDistance; i++) {
+        for (int i = 1; i <= currentState.viewDistance; i++) {
             fieldOfViewCells.add(getCurrentMainCellCoordinates().jump(getOrientation().toVector().mul(i)));
         }
         return fieldOfViewCells;
@@ -186,7 +168,7 @@ public class BombFoe extends Foe implements TargetFollower {
 
     @Override
     public boolean wantsViewInteraction() {
-        return state.aggressive;
+        return currentState.aggressive && inactivityTimer.isOff();
     }
 
     @Override
@@ -196,12 +178,12 @@ public class BombFoe extends Foe implements TargetFollower {
 
     @Override
     public boolean isCellInteractable() {
-        return state.damageable;
+        return currentState.damageable;
     }
 
     @Override
     public boolean isViewInteractable() {
-        return state.damageable;
+        return currentState.damageable;
     }
 
     @Override
@@ -214,25 +196,19 @@ public class BombFoe extends Foe implements TargetFollower {
         @Override
         public void interactWith(ICoopPlayer player, boolean isCellInteraction) {
             if (inactivityTimer.isOff()) {
-                state = BombFoeState.ATTACKING;
-                setTarget(player);
-                //targetDisplacement(player);
-                switch (state) {
-                    case ATTACKING: {
-                    }
+                switch (currentState) {
                     case IDLE: {
-                        state = BombFoeState.ATTACKING;
-                        //targetDisplacement(player);
+                        currentState = BombFoeState.ATTACKING;
+                        setTarget(player);
+                        break;
+                    }
+                    case ATTACKING: {
+                        placeBomb();
                     }
                 }
+
             }
         }
-
-
-        /*@Override
-        public void interactWith(Bomb bomb, boolean isCellInteraction) {
-            bomb.activate();
-        }*/
     }
 
 }
