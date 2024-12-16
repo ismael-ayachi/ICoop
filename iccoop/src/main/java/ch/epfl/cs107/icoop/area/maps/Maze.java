@@ -26,6 +26,12 @@ public class Maze extends ICoopArea {
     protected void createArea() {
         registerActor(new Background(this));
         registerActor(new Foreground(this));
+
+        /** Door **/
+
+        registerActor(new Door(this, "Arena", Logic.TRUE, new DiscreteCoordinates(4,5),
+                new DiscreteCoordinates(14,15), new DiscreteCoordinates(19,6), new DiscreteCoordinates(19,7)));
+
         /** Entities **/
         registerActor(new Bomb(this, Orientation.DOWN, new DiscreteCoordinates(6,25)));
 

@@ -5,6 +5,7 @@ import ch.epfl.cs107.icoop.actor.CenterOfMass;
 import ch.epfl.cs107.icoop.actor.ElementalEntity;
 import ch.epfl.cs107.icoop.actor.ICoopPlayer;
 import ch.epfl.cs107.icoop.area.ICoopArea;
+import ch.epfl.cs107.icoop.area.maps.Arena;
 import ch.epfl.cs107.icoop.area.maps.Maze;
 import ch.epfl.cs107.icoop.area.maps.OrbWay;
 import ch.epfl.cs107.icoop.area.maps.Spawn;
@@ -19,7 +20,7 @@ import ch.epfl.cs107.play.engine.actor.Dialog;
 
 public final class ICoop extends AreaGame implements DialogHandler {
 
-    private final String[] areas = {"Spawn", "OrbWay", "Maze"};
+    private final String[] areas = {"Spawn", "OrbWay", "Maze", "Arena"};
 
     private ICoopPlayer player1;
     private ICoopPlayer player2;
@@ -34,6 +35,7 @@ public final class ICoop extends AreaGame implements DialogHandler {
         addArea(new Spawn(this));
         addArea(new OrbWay(this));
         addArea(new Maze());
+        addArea(new Arena());
     }
 
     /**
@@ -45,7 +47,7 @@ public final class ICoop extends AreaGame implements DialogHandler {
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {
             createAreas();
-            initArea(areas[0]);
+            initArea(areas[3]);
             return true;
         }
         return false;

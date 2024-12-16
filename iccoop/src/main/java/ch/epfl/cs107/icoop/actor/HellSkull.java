@@ -86,11 +86,6 @@ public class HellSkull extends Foe implements Interactable {
     }
 
     @Override
-    public void acceptInteraction(AreaInteractionVisitor v, boolean isCellInteraction) {
-        ((ICoopInteractionVisitor) v).interactWith(this, isCellInteraction);
-    }
-
-    @Override
     public void interactWith(Interactable other, boolean isCellInteraction) {
         other.acceptInteraction(handler, isCellInteraction);
     }
