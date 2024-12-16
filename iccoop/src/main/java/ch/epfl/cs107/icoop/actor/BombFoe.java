@@ -108,10 +108,12 @@ public class BombFoe extends Foe implements TargetFollower {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        if (currentState == BombFoeState.GUARDING) {
-            protectedAnimation.draw(canvas);
-        } else {
-            unprotectedAnimation.draw(canvas);
+        if (!isDead()) {
+            if (currentState == BombFoeState.GUARDING) {
+                protectedAnimation.draw(canvas);
+            } else {
+                unprotectedAnimation.draw(canvas);
+            }
         }
     }
 

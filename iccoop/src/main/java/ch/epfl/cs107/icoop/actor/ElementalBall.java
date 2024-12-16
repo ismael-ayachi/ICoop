@@ -55,16 +55,6 @@ public class ElementalBall extends Projectile implements Unstoppable, ElementalE
     }
 
     @Override
-    public boolean isCellInteractable() {
-        return true;
-    }
-
-    @Override
-    public boolean isViewInteractable() {
-        return true;
-    }
-
-    @Override
     public void interactWith(Interactable other,boolean isCellInteraction) {
         other.acceptInteraction(handler, isCellInteraction);
     }
