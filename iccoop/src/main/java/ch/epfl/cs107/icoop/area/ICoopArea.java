@@ -1,21 +1,25 @@
 package ch.epfl.cs107.icoop.area;
 
+import ch.epfl.cs107.icoop.actor.Obstacle;
+import ch.epfl.cs107.icoop.actor.Rock;
+import ch.epfl.cs107.icoop.handler.AreaCellTypeHandler;
+import ch.epfl.cs107.icoop.handler.Challenge;
 import ch.epfl.cs107.play.areagame.area.Area;
-import ch.epfl.cs107.play.engine.actor.Dialog;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.window.Canvas;
+import ch.epfl.cs107.play.math.Orientation;
+import ch.epfl.cs107.play.signal.logic.Logic;
 import ch.epfl.cs107.play.window.Window;
 
-public abstract class ICoopArea extends Area {
+public abstract class ICoopArea extends Area implements AreaCellTypeHandler, Logic {
     public final static float DEFAULT_SCALE_FACTOR = 13.f;
     private float cameraScaleFactor = DEFAULT_SCALE_FACTOR;
+    private Challenge challenge;
 
     /**
      * Area specific callback to initialise the instance
      */
     protected abstract void createArea();
-
     /**
      * @return the player's spawn position in the area
      */
@@ -30,7 +34,7 @@ public abstract class ICoopArea extends Area {
     @Override
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {
-            setBehavior(new ICoopBehavior(window, getTitle()));
+            setBehavior(new ICoopBehavior(window, getTitle(), this));
             createArea();
             return true;
         }
@@ -59,5 +63,32 @@ public abstract class ICoopArea extends Area {
     }
 
     @Override
-    public boolean isViewCentered () { return false ; }
+    public boolean isViewCentered () { return true ; }
+
+    @Override
+    public void addCellTypeActor(ICoopBehavior.ICoopCellType cellType, DiscreteCoordinates coords){
+        switch (cellType) {
+            case ROCK: {
+                registerActor(new Rock(this, Orientation.DOWN, coords));
+                break;
+            }
+            case OBSTACLE: {
+                registerActor(new Obstacle(this, Orientation.DOWN, coords));
+            }
+        }
+    }
+
+    protected void createChallenge(Logic...signals){
+        this.challenge = new Challenge(signals);
+    }
+
+    @Override
+    public boolean isOn() {
+        return challenge!=null && challenge.isOn();
+    }
+
+    @Override
+    public boolean isOff() {
+        return !isOn();
+    }
 }

@@ -6,21 +6,20 @@ import ch.epfl.cs107.icoop.handler.DialogHandler;
 import ch.epfl.cs107.play.engine.actor.Background;
 import ch.epfl.cs107.play.engine.actor.Dialog;
 import ch.epfl.cs107.play.engine.actor.Foreground;
-import ch.epfl.cs107.play.engine.actor.OrientedAnimation;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.signal.logic.Logic;
-import ch.epfl.cs107.play.window.Canvas;
 
 public class Spawn extends ICoopArea {
     private final DialogHandler dialogHandler;
     private final Dialog dialog;
-    private boolean playDialogue = true;
+    private boolean playDialog = true;
 
-    public Spawn(DialogHandler handler){
+    public Spawn(DialogHandler handler, Logic...manorChallengeConditions){
         super();
-        dialogHandler = handler;
-        dialog = new Dialog("welcome");
+        this.dialogHandler = handler;
+        this.dialog = new Dialog("welcome");
+        createChallenge(manorChallengeConditions);
     }
 
     @Override
@@ -37,7 +36,11 @@ public class Spawn extends ICoopArea {
         registerActor(new Rock(this, Orientation.DOWN, new DiscreteCoordinates(10,10)));
         registerActor(new Bomb(this, Orientation.DOWN, new DiscreteCoordinates(11,10)));
         registerActor(new Door(this, "Maze", Logic.TRUE, new DiscreteCoordinates(2,39),
-                new DiscreteCoordinates(3,39), new DiscreteCoordinates(4,0), new DiscreteCoordinates(5,0)));    }
+                new DiscreteCoordinates(3,39), new DiscreteCoordinates(4,0), new DiscreteCoordinates(5,0)));
+
+        registerActor(new ManorDoor(this, "Spawn", this, new DiscreteCoordinates(5,6), new DiscreteCoordinates(5,7),
+                new DiscreteCoordinates(6,11), dialogHandler));
+    }
 
     @Override
     public String getTitle() {
@@ -47,10 +50,10 @@ public class Spawn extends ICoopArea {
     @Override
     public void update(float deltaTime){
         super.update(deltaTime);
-        if (playDialogue) {
+        if (playDialog) {
             dialogHandler.publish(dialog);
             if (dialog.isCompleted()) {
-                playDialogue = false;
+                playDialog = false;
             }
         }
     }

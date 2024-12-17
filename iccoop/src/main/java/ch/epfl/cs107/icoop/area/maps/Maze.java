@@ -1,9 +1,6 @@
 package ch.epfl.cs107.icoop.area.maps;
 
-import ch.epfl.cs107.icoop.actor.Bomb;
-import ch.epfl.cs107.icoop.actor.ElementalWall;
-import ch.epfl.cs107.icoop.actor.Heart;
-import ch.epfl.cs107.icoop.actor.PressurePlate;
+import ch.epfl.cs107.icoop.actor.*;
 import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.play.engine.actor.Background;
 import ch.epfl.cs107.play.engine.actor.Foreground;
@@ -13,9 +10,10 @@ import ch.epfl.cs107.play.signal.logic.Logic;
 
 import static ch.epfl.cs107.icoop.actor.ElementalWall.WallType.FIRE_WALL;
 import static ch.epfl.cs107.icoop.actor.ElementalWall.WallType.WATER_WALL;
+import static ch.epfl.cs107.icoop.actor.Staff.StaffType.WATER_STAFF;
+import static ch.epfl.cs107.icoop.actor.Staff.StaffType.FIRE_STAFF;
 
 public class Maze extends ICoopArea {
-
 
     @Override
     public DiscreteCoordinates[] getPlayerSpawnPosition() {
@@ -65,7 +63,30 @@ public class Maze extends ICoopArea {
         registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(8,4), WATER_WALL, Logic.TRUE));
         registerActor(new ElementalWall(this, Orientation.DOWN, new DiscreteCoordinates(13,4), FIRE_WALL, Logic.TRUE));
 
+        /**Foes**/
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(12,33)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(12,31)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(12,29)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(12,27)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(12,25)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(10,33)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(10,32)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(10,30)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(10,28)));
+        registerActor(new HellSkull(this, Orientation.RIGHT, new DiscreteCoordinates(10,26)));
 
+        registerActor(new BombFoe(this, Orientation.DOWN, new DiscreteCoordinates(5,15)));
+        registerActor(new BombFoe(this, Orientation.DOWN, new DiscreteCoordinates(5,14)));
+        registerActor(new BombFoe(this, Orientation.DOWN, new DiscreteCoordinates(6,17)));
+        registerActor(new BombFoe(this, Orientation.DOWN, new DiscreteCoordinates(10,17)));
+
+        /**Staff**/
+        Staff fireStaff = new Staff(this, new DiscreteCoordinates(13,2), FIRE_STAFF );
+        Staff waterStaff = new Staff(this, new DiscreteCoordinates(8,2), WATER_STAFF );
+        registerActor(fireStaff);
+        registerActor(waterStaff);
+
+        createChallenge(fireStaff, waterStaff);
     }
 
     @Override

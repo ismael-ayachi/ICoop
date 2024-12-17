@@ -197,18 +197,9 @@ public class BombFoe extends Foe implements TargetFollower {
 
         @Override
         public void interactWith(ICoopPlayer player, boolean isCellInteraction) {
-            if (inactivityTimer.isOff()) {
-                switch (currentState) {
-                    case IDLE: {
-                        currentState = BombFoeState.ATTACKING;
-                        setTarget(player);
-                        break;
-                    }
-                    case ATTACKING: {
-                        placeBomb();
-                    }
-                }
-
+            if (inactivityTimer.isOff() && currentState == BombFoeState.IDLE) {
+                currentState = BombFoeState.ATTACKING;
+                setTarget(player);
             }
         }
     }

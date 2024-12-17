@@ -7,7 +7,7 @@ import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.signal.logic.Logic;
 import java.util.List;
 
-public abstract class ElementalItem extends ICoopCollectable implements ElementalEntity,Logic {
+public abstract class ElementalItem extends ICoopCollectable implements ElementalEntity {
 
     private final Element element;
 
@@ -21,17 +21,12 @@ public abstract class ElementalItem extends ICoopCollectable implements Elementa
     }
 
     @Override
+    public Element element() {
+        return element;
+    }
+
+    @Override
     public List<DiscreteCoordinates> getCurrentCells() {
         return List.of();
-    }
-
-    @Override
-    public boolean isOn() {
-        return isCollected();
-    }
-
-    @Override
-    public boolean isOff() {
-        return !isCollected();
     }
 }

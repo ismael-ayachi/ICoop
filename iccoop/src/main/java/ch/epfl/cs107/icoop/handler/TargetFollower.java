@@ -12,14 +12,9 @@ import static ch.epfl.cs107.play.math.Orientation.fromVector;
 public interface TargetFollower  {
 
     default void targetDisplacement(TargetEntity target) {
-        //float distance = DiscreteCoordinates.distanceBetween(this.getCurrentMainCellCoordinates(), player.getCurrentMainCellCoordinates());
-        float BombFoeX = this.getCurrentMainCellCoordinates().toVector().getX();
-        float BombFoeY = this.getCurrentMainCellCoordinates().toVector().getY();
-        float TargetX = target.getCurrentMainCellCoordinates().toVector().getX();
-        float TargetY = target.getCurrentMainCellCoordinates().toVector().getY();
-        Vector BombFoeVector = this.getCurrentMainCellCoordinates().toVector();
-        Vector TargetVector = target.getCurrentMainCellCoordinates().toVector();
-        Vector v = TargetVector.sub(BombFoeVector);
+        Vector followerVector = this.getCurrentMainCellCoordinates().toVector();
+        Vector targetVector = target.getCurrentMainCellCoordinates().toVector();
+        Vector v = targetVector.sub(followerVector);
         float deltaX = v.getX();
         float deltaY = v.getY();
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -27,7 +22,7 @@ public interface TargetFollower  {
         }
         else if (Math.abs(deltaY) > Math.abs(deltaX)) {
             orientate(fromVector(new Vector(0, deltaY)));
-        }
+        }                                
     }
 
     default boolean orientate(Orientation orientation) {return false;}

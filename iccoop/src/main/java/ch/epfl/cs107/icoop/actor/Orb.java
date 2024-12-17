@@ -19,7 +19,6 @@ public class Orb extends ElementalItem {
 
     private final static int ANIMATION_DURATION = 24;
     private final static int ANIMATION_FRAMES = 6;
-    private final int spriteYDelta;
     final Sprite[] sprites = new Sprite [ ANIMATION_FRAMES ];
     private final Animation orbAnimation;
 
@@ -51,7 +50,6 @@ public class Orb extends ElementalItem {
         super(area, Orientation.UP, position, orbType.element);
         this.element = orbType.element;
         this.damageType = orbType.damageType;
-        this.spriteYDelta = orbType.spriteYDelta;
         this.orbDialog = orbType.orbDialog;
 
         this.dialogHandler = handler;
@@ -59,7 +57,7 @@ public class Orb extends ElementalItem {
 
         for ( int i = 0; i < ANIMATION_FRAMES ; i ++) {
             sprites [i] = new RPGSprite("icoop/orb", 1, 1, this ,
-                    new RegionOfInterest(i * 32 , spriteYDelta , 32 , 32) );
+                    new RegionOfInterest(i * 32 , orbType.spriteYDelta , 32 , 32) );
         }
         orbAnimation = new Animation ( ANIMATION_DURATION / ANIMATION_FRAMES , sprites );
     }

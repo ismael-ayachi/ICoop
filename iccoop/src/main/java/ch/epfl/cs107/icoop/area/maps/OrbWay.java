@@ -3,13 +3,10 @@ package ch.epfl.cs107.icoop.area.maps;
 import ch.epfl.cs107.icoop.actor.*;
 import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.icoop.handler.DialogHandler;
-import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.engine.actor.Background;
-import ch.epfl.cs107.play.engine.actor.Dialog;
 import ch.epfl.cs107.play.engine.actor.Foreground;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
-import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.logic.Logic;
 
 import java.util.List;
@@ -18,7 +15,6 @@ import static ch.epfl.cs107.icoop.actor.ElementalWall.WallType.FIRE_WALL;
 import static ch.epfl.cs107.icoop.actor.ElementalWall.WallType.WATER_WALL;
 import static ch.epfl.cs107.icoop.actor.Orb.OrbType.FIRE_ORB;
 import static ch.epfl.cs107.icoop.actor.Orb.OrbType.WATER_ORB;
-import static ch.epfl.cs107.play.math.Orientation.LEFT;
 
 public class OrbWay extends ICoopArea {
     private DialogHandler dialogHandler;
@@ -35,8 +31,6 @@ public class OrbWay extends ICoopArea {
 
     @Override
     protected void createArea() {
-        registerActor(new Orb(this,new DiscreteCoordinates(17,12), FIRE_ORB, dialogHandler));
-        registerActor(new Orb(this,new DiscreteCoordinates(17,6), WATER_ORB, dialogHandler));
         registerActor(new Background(this));
         registerActor(new Foreground(this));
         registerActor(new Door(this, "Spawn", Logic.TRUE, new DiscreteCoordinates(18,16), new DiscreteCoordinates(18,15),
@@ -62,6 +56,12 @@ public class OrbWay extends ICoopArea {
         registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(7, 12), WATER_WALL, Logic.TRUE));
         registerActor(new ElementalWall(this, Orientation.LEFT, new DiscreteCoordinates(7, 6) , FIRE_WALL, Logic.TRUE));
 
+        Orb fireOrb = new Orb(this,new DiscreteCoordinates(17,12), FIRE_ORB, dialogHandler);
+        Orb waterOrb = new Orb(this,new DiscreteCoordinates(17,6), WATER_ORB, dialogHandler);
+        registerActor(fireOrb);
+        registerActor(waterOrb);
+
+        createChallenge(fireOrb, waterOrb);
     }
 
 

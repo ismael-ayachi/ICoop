@@ -1,11 +1,12 @@
 package ch.epfl.cs107.icoop.area;
 
 import ch.epfl.cs107.icoop.actor.*;
+import ch.epfl.cs107.icoop.handler.AreaCellTypeHandler;
 import ch.epfl.cs107.icoop.handler.ICoopInteractionVisitor;
 import ch.epfl.cs107.play.areagame.actor.Interactable;
 import ch.epfl.cs107.play.areagame.area.AreaBehavior;
 import ch.epfl.cs107.play.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.engine.actor.Actor;
+import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 
 public class ICoopBehavior extends AreaBehavior {
@@ -15,7 +16,7 @@ public class ICoopBehavior extends AreaBehavior {
      * @param window (Window), not null
      * @param name   (String): Name of the Behavior, not null
      */
-    public ICoopBehavior(Window window, String name) {
+    public ICoopBehavior(Window window, String name, AreaCellTypeHandler cellTypeHandler) {
         super(window, name);
         int height = getHeight();
         int width = getWidth();
@@ -23,6 +24,7 @@ public class ICoopBehavior extends AreaBehavior {
             for (int x = 0; x < width; x++) {
                 ICoopCellType color = ICoopCellType.toType(getRGB(height - 1 - y, x));
                 setCell(x, y, new ICoopCell(x, y, color));
+                cellTypeHandler.addCellTypeActor(color, new DiscreteCoordinates(x, y));
             }
         }
     }
@@ -61,6 +63,8 @@ public class ICoopBehavior extends AreaBehavior {
             return NULL;
         }
     }
+
+
 
     /**
      * Cell adapted to the ICoop game
@@ -107,9 +111,13 @@ public class ICoopBehavior extends AreaBehavior {
                 else if (entity instanceof Projectile){
                     return type.canFly;
                 }
+
+
             }
             return type.canWalk;
         }
+
+
 
         @Override
         public boolean isCellInteractable() {
@@ -124,6 +132,7 @@ public class ICoopBehavior extends AreaBehavior {
         @Override
         public void acceptInteraction ( AreaInteractionVisitor v , boolean isCellInteraction ) {
             ((ICoopInteractionVisitor) v). interactWith( this ,isCellInteraction );
+
         }
 
     }

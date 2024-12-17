@@ -8,6 +8,7 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Orientation;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.signal.logic.Logic;
+import ch.epfl.cs107.play.signal.logic.MultipleAnd;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,41 +17,25 @@ import java.util.List;
 
 public class Door extends AreaEntity {
 
-    private String destination;
-    private Logic signal;
-    private DiscreteCoordinates[] playerDestination;
-    private DiscreteCoordinates[] otherPositions;
-    private DiscreteCoordinates mainPosition;
+    private final String destination;
+    private final Logic signal;
+    private final DiscreteCoordinates[] playerDestination;
+    private final DiscreteCoordinates[] doorPosition;
 
+    public Door(Area area, String destination, Logic signal, DiscreteCoordinates posPlayer1, DiscreteCoordinates posPlayer2, DiscreteCoordinates ... doorPos) {
+        super(area, Orientation.DOWN, doorPos[0]);
+        this.destination = destination;
+        this.signal = signal;
+        this.playerDestination = new DiscreteCoordinates[]{posPlayer1, posPlayer2};
+        this.doorPosition = doorPos;
+    }
 
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
         List <DiscreteCoordinates> cells = new ArrayList<>();
-        Collections.addAll(cells, otherPositions);
-        cells.add(mainPosition);
+        Collections.addAll(cells, doorPosition);
         return cells;
 
-    }
-
-    public Logic getSignal() {
-        return signal;
-    }
-
-    public Door(Area area, String destination, Logic signal, DiscreteCoordinates posPlayer1, DiscreteCoordinates posPlayer2, DiscreteCoordinates mainPos) {
-        super(area, Orientation.DOWN, mainPos);
-        this.destination = destination;
-        this.signal = signal;
-        playerDestination = new DiscreteCoordinates[]{posPlayer1, posPlayer2};
-        mainPosition = mainPos;
-    }
-
-    public Door(Area area, String destination, Logic signal, DiscreteCoordinates posPlayer1, DiscreteCoordinates posPlayer2,DiscreteCoordinates mainPos, DiscreteCoordinates ... otherPos) {
-        super(area, Orientation.DOWN, mainPos);
-        this.destination = destination;
-        this.signal = signal;
-        playerDestination = new DiscreteCoordinates[]{posPlayer1, posPlayer2};
-        mainPosition = mainPos;
-        otherPositions = otherPos;
     }
 
     public String getDestination() {
@@ -67,9 +52,15 @@ public class Door extends AreaEntity {
         return false;
     }
 
+
+    public boolean isActive() {
+        return signal.isOn();
+    }
+
+
     @Override
     public boolean isCellInteractable() {
-        return true;
+        return isActive();
     }
 
     @Override

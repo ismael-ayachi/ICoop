@@ -83,12 +83,12 @@ public abstract class Foe extends MovableAreaEntity implements Interactor {
 
     @Override
     public boolean wantsCellInteraction() {
-        return true;
+        return !isDead();
     }
 
     @Override
     public boolean wantsViewInteraction() {
-        return true;
+        return !isDead();
     }
 
     @Override

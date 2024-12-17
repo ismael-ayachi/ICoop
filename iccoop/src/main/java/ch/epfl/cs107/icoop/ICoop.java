@@ -2,7 +2,6 @@ package ch.epfl.cs107.icoop;
 
 
 import ch.epfl.cs107.icoop.actor.CenterOfMass;
-import ch.epfl.cs107.icoop.actor.ElementalEntity;
 import ch.epfl.cs107.icoop.actor.ICoopPlayer;
 import ch.epfl.cs107.icoop.area.ICoopArea;
 import ch.epfl.cs107.icoop.area.maps.Arena;
@@ -29,16 +28,21 @@ public final class ICoop extends AreaGame implements DialogHandler {
 
 
     /**
-     * Add all the Tuto2 areas
+     * Add all the areas
      */
     private void createAreas() {
-        addArea(new Spawn(this));
-        addArea(new OrbWay(this));
-        addArea(new Maze());
-        addArea(new Arena());
+        OrbWay orbWay = new OrbWay(this);
+        Maze maze = new Maze();
+        Arena arena = new Arena();
+        Spawn spawn = new Spawn(this, orbWay, maze, arena);
+        
+        addArea(arena);
+        addArea(maze);
+        addArea(spawn);
+        addArea(orbWay);
     }
 
-    /**
+    /**3
      * @param window (Window): display context. Not null
      * @param fileSystem (FileSystem): given file system. Not null
      * @return true if the game begins properly
@@ -47,7 +51,7 @@ public final class ICoop extends AreaGame implements DialogHandler {
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {
             createAreas();
-            initArea(areas[3]);
+            initArea(areas[0]);
             return true;
         }
         return false;
@@ -78,20 +82,15 @@ public final class ICoop extends AreaGame implements DialogHandler {
             }
 
             if (player1.isDoorPassed()) {
-                String areakey = player1.getCurrentDoor().getDestination();
+                String areaKey = player1.getCurrentDoor().getDestination();
                 DiscreteCoordinates[] coords = player1.getCurrentDoor().getPlayerDestination();
-                switchArea(areakey, coords, false);
+                switchArea(areaKey, coords, false);
             }
-            player1.setDoorIsPassed(false);
             if (player2.isDoorPassed()) {
-                String areakey = player2.getCurrentDoor().getDestination();
+                String areaKey = player2.getCurrentDoor().getDestination();
                 DiscreteCoordinates[] coords = player2.getCurrentDoor().getPlayerDestination();
-                switchArea(areakey, coords, false);
+                switchArea(areaKey, coords, false);
             }
-            player2.setDoorIsPassed(false);
-
-
-
         } else {
             getCurrentArea().draw(getWindow());
             activeDialog.draw(getWindow());
@@ -110,7 +109,6 @@ public final class ICoop extends AreaGame implements DialogHandler {
 
     @Override
     public void end() {
-
     }
 
 
@@ -152,6 +150,4 @@ public final class ICoop extends AreaGame implements DialogHandler {
             player2.resetHealth();
         }
     }
-
-
 }

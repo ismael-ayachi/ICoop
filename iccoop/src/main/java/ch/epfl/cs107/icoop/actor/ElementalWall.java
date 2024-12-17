@@ -22,7 +22,7 @@ public class ElementalWall extends AreaEntity implements ElementalEntity, Intera
 
     private final Element element;
     private final DamageType damageType;
-    private static final int DAMAGE_QUANTITY = 1;
+    private static final int DAMAGE_QUANTITY = 2;
 
     private final ElementalWallInteractionHandler handler;
 

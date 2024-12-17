@@ -80,5 +80,15 @@ public class ElementalBall extends Projectile implements Unstoppable, ElementalE
         public void interactWith(Bomb bomb, boolean isCellInteraction) {
             bomb.explode();
         }
+
+        @Override
+        public void interactWith(Rock rock, boolean isCellInteraction){
+            rock.destroy();
+        }
+
+        @Override
+        public void interactWith(Obstacle obstacle, boolean isCellInteraction) {
+            stopProjectile();
+        }
     }
 }
