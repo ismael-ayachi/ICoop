@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MP2-2024-UPDATE:jar">
+    <output-path>$PROJECT_DIR$/../MP2_FINAL</output-path>
+    <root id="archive" name="MP2-2024-UPDATE.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/../MP2_FINAL/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="tutos" />
+      <element id="module-output" name="game-engine" />
+      <element id="module-output" name="iccoop" />
+    </root>
+  </artifact>
+</component>

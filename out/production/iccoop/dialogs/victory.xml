@@ -1,4 +1,4 @@
 <strings id="welcome">
-    <string name="game_name">Félicitations ! Vous vous êtes échappés du piège de la Reine.</string>
-    <string name="game_name">À vous d'améliorer le jeu à votre convenance.</string>
+    <string name="game_name">Félicitations ! Vous avez échappé aux pièges du Roi de la Nuit.</string>
+    <string name="game_name">Vous avez rompu la malédiction qui bloquait l'accès au Manoir !</string>
 </strings>
