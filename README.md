@@ -24,7 +24,7 @@ The game is inspired by [Fireboy and Watergirl](https://en.wikipedia.org/wiki/Fi
 
 ## Overview
 
-**IC-CoOp** ("IC Cooperative") is a top-down, tile-based cooperative game. Both players share the same world and must reach and clear the final boss room while staying alive. Progress is gated behind cooperative *challenges* that require both the Fire and Water player to contribute — neither player can finish the game alone.
+**ICoop** ("IC Cooperative") is a top-down, tile-based cooperative game. Both players share the same world and must reach and clear the final boss room while staying alive. Progress is gated behind cooperative *challenges* that require both the Fire and Water player to contribute — neither player can finish the game alone.
 
 The two playable characters are **elemental entities**:
 
