@@ -1,4 +1,4 @@
-# IC-CoOp 2024
+# ICoop
 
 A 2-player cooperative action-adventure game built in Java on top of a custom 2D game engine, developed as the second mini-project (MP2) of the EPFL CS-107 *Introduction à la programmation* course.
 
