@@ -231,6 +231,7 @@ public abstract class MovableAreaEntity extends AreaEntity {
 
     @Override
     public void update(float deltaTime) {
+        super.update(deltaTime);
         if (displacementOccurs) {
             if (!isTargetReached()) {
                 increasePositionOf(1);
